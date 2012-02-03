@@ -6,8 +6,8 @@ Install this repository via [Package Control](http://wbond.net/sublime_packages/
 ## Usage
 To prettify json, make selection of json and press keys:
 
-- Linux: `ctrl+shift+j`
-- Windows: `ctrl+shift+j`
-- OS X: `super+shift+j`
+- Linux: `ctrl+alt+j`
+- Windows: `ctrl+alt+j`
+- OS X: `super+ctrl+j`
 
 If JSON is not valid it will be displayed in status bar of sublime

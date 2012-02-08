@@ -1,3 +1,14 @@
 [
-	{ "keys": ["super+ctrl+j"], "command": "prettyjson" }
+	// Only use this for the "source.json" scope
+    {
+        "keys": ["super+ctrl+j"],
+        "command": "prettyjson",
+        "context": [
+        {
+	        "key": "selector",
+	        "operator": "equal",
+	        "operand": "source.json"
+	    }
+	    ]
+	}
 ]

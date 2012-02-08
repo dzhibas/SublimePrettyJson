@@ -8,8 +8,6 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         for region in self.view.sel():
             # If no selection, use the entire file as the selection
-            # TODO: Use a setting to determine whether to do the entire file
-            # if region.empty():
             if region.empty() and s.get("use_entire_file_if_no_selection"):
                 selection = sublime.Region(0, self.view.size())
             else:
@@ -17,8 +15,6 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
             
             try:
                 obj = json.loads(self.view.substr(selection))
-                # TODO: Use a setting for the sort_keys value
-                # TODO: Use a setting for the indent value
                 self.view.replace(edit, selection, json.dumps(obj, indent=s.get("indent_size", 4), ensure_ascii=False, sort_keys=s.get("sort_keys", True)))
             except Exception, e:
                 sublime.status_message(str(e))

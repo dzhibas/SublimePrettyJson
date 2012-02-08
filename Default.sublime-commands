@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "Pretty JSON: Reformat (Pretty Print) JSON",
+        "command": "prettyjson"
+    }
+]

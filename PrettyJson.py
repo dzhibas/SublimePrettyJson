@@ -5,6 +5,8 @@ import json
 s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 class PrettyjsonCommand(sublime_plugin.TextCommand):
+    """ Pretty Print JSON
+    """
     def run(self, edit):
         for region in self.view.sel():
             # If no selection, use the entire file as the selection

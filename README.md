@@ -10,15 +10,17 @@ To prettify JSON, make selection of json and press keys:
 - Windows: `ctrl+alt+j`
 - OS X: `super+ctrl+j`
 
-If selection is empty and configuration entry *use_entire_file_if_no_selection* is true, tries to prettify whole file.
+If selection is empty and configuration entry **use_entire_file_if_no_selection** is true, tries to prettify whole file.
 
 If JSON is not valid it will be displayed in status bar of sublime.
 
 ## Default configuration
 
-*use_entire_file_if_no_selection* - true
-*indent_size* - 4
-*sort_keys* - true
+**use_entire_file_if_no_selection** - true
+
+**indent_size** - 4
+
+**sort_keys** - true
 
 ## Thanks
 https://github.com/the3rdhbtaylor

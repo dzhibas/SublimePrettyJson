@@ -1,13 +1,8 @@
 [
     {
-        "keys": ["ctrl+alt+j"],
-        "command": "prettyjson",
-        "context": [
-        {
-	        "key": "selector",
-	        "operator": "equal",
-	        "operand": "source.json"
-	    }
-	    ]
-	}
+        "keys": [
+            "ctrl+alt+j"
+        ], 
+        "command": "prettyjson"
+    }
 ]

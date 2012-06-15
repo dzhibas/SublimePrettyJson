@@ -1,5 +1,5 @@
 {
     "use_entire_file_if_no_selection" : true,
     "indent_size" : 4,
-    "sort_keys" : true
+    "sort_keys" : false
 }

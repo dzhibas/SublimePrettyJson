@@ -20,7 +20,7 @@ If JSON is not valid it will be displayed in status bar of sublime.
 
 **indent_size** - 4
 
-**sort_keys** - true
+**sort_keys** - false
 
 ## Thanks
 https://github.com/the3rdhbtaylor

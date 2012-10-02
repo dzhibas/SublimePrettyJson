@@ -3,6 +3,7 @@
         "keys": [
             "super+ctrl+j"
         ], 
-        "command": "prettyjson"
+        "command": "prettyjson",
+        "context":  [{"key": "selector", "operator": "equal", "operand": "source.json"}]
     }
 ]

@@ -18,9 +18,21 @@ If JSON is not valid it will be displayed in status bar of sublime.
 
 **use_entire_file_if_no_selection** - true
 
-**indent_size** - 4
+**indent** - 4
 
 **sort_keys** - false
+
+**ensure_ascii** - false
+
+## Using tabs for indentation
+
+You can change configuration key **indent** to string value "\t" or any other string.
+
+```
+"indent_size" : "\t",
+```
+
+Be sure "Indent Using Spaces" is unchecked otherwise you will not see effect and ST2 will convert it back to spaces.
 
 ## Thanks
 https://github.com/the3rdhbtaylor

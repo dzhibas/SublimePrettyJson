@@ -5,9 +5,13 @@ import sys
 
 if sys.version_info > (2, 7, 0):
     import json
+    from json import encoder
+    encoder.FLOAT_REPR = lambda o: format(o, ".15g")
     from collections import OrderedDict
 else:
     import simplejson as json
+    from simplejson import encoder
+    encoder.FLOAT_REPR = lambda o: "%.15g" % o
     from simplejson import OrderedDict
 
 

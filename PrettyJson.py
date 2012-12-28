@@ -30,9 +30,9 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                 obj = json.loads(self.view.substr(selection),
                     object_pairs_hook=OrderedDict,
                     parse_float=decimal.Decimal)
-                print obj
+
                 self.view.replace(edit, selection, json.dumps(obj,
-                    indent=s.get("indent", 4),
+                    indent=s.get("indent", 2),
                     ensure_ascii=s.get("ensure_ascii", False),
                     sort_keys=s.get("sort_keys", False),
                     separators=(',', ': '),

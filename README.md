@@ -18,7 +18,7 @@ If JSON is not valid it will be displayed in status bar of sublime.
 
 **use_entire_file_if_no_selection** - true
 
-**indent** - 4
+**indent** - 2
 
 **sort_keys** - false
 

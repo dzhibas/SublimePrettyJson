@@ -2,16 +2,13 @@ import sublime
 import sublime_plugin
 import json
 import sys
+import decimal
 
 if sys.version_info > (2, 7, 0):
     import json
-    from json import encoder
-    encoder.FLOAT_REPR = lambda o: format(o, ".15g")
     from collections import OrderedDict
 else:
     import simplejson as json
-    from simplejson import encoder
-    encoder.FLOAT_REPR = lambda o: "%.15g" % o
     from simplejson import OrderedDict
 
 
@@ -30,7 +27,16 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                 selection = region
 
             try:
-                obj = json.loads(self.view.substr(selection), object_pairs_hook=OrderedDict)
-                self.view.replace(edit, selection, json.dumps(obj, indent=s.get("indent", 4), ensure_ascii=s.get("ensure_ascii", False), sort_keys=s.get("sort_keys", False), separators=(',', ': ')))
+                obj = json.loads(self.view.substr(selection),
+                    object_pairs_hook=OrderedDict,
+                    parse_float=decimal.Decimal)
+                print obj
+                self.view.replace(edit, selection, json.dumps(obj,
+                    indent=s.get("indent", 4),
+                    ensure_ascii=s.get("ensure_ascii", False),
+                    sort_keys=s.get("sort_keys", False),
+                    separators=(',', ': '),
+                    use_decimal=True))
+
             except Exception, e:
                 sublime.status_message(str(e))

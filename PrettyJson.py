@@ -5,7 +5,6 @@ import sys
 import decimal
 
 if sys.version_info > (2, 7, 0):
-    import json
     from collections import OrderedDict
 else:
     import simplejson as json
@@ -40,3 +39,9 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
 
             except Exception, e:
                 sublime.status_message(str(e))
+
+    def is_enabled(self):
+        view = self.view
+        if view is None:
+            view = sublime.active_window().active_view()
+        return 'source.json' in view.scope_name(0) or 'source.javascript' in view.scope_name(0)

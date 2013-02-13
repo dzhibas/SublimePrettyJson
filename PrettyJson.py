@@ -1,8 +1,9 @@
 import sublime
 import sublime_plugin
 import json
-import json
-from collections import OrderedDict
+import simplejson as json
+from simplejson import OrderedDict
+import decimal
 
 s = sublime.load_settings("Pretty JSON.sublime-settings")
 
@@ -20,13 +21,15 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
 
             try:
                 obj = json.loads(self.view.substr(selection),
-                    object_pairs_hook=OrderedDict)
+                    object_pairs_hook=OrderedDict,
+                    parse_float=decimal.Decimal)
 
                 self.view.replace(edit, selection, json.dumps(obj,
                     indent=s.get("indent", 2),
                     ensure_ascii=s.get("ensure_ascii", False),
                     sort_keys=s.get("sort_keys", False),
-                    separators=(',', ': ')))
+                    separators=(',', ': '),
+                    use_decimal=True))
 
-            except Exception as e:
-                sublime.status_message(str(e))
+            except Exception:
+                sublime.status_message("Error parsing JSON")

@@ -31,4 +31,6 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                     use_decimal=True))
 
             except Exception:
-                sublime.status_message("Error parsing JSON")
+                import sys
+                exc = sys.exc_info()[1]
+                sublime.status_message(str(exc))

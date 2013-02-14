@@ -1,6 +1,5 @@
 import sublime
 import sublime_plugin
-import json
 import simplejson as json
 from simplejson import OrderedDict
 import decimal

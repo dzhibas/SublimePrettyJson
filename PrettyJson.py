@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
-import simplejson as json
-from simplejson import OrderedDict
+import PrettyJSON.simplejson as json
+from PrettyJSON.simplejson import OrderedDict
 import decimal
 
 s = sublime.load_settings("Pretty JSON.sublime-settings")

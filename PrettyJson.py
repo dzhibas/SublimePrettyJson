@@ -1,8 +1,15 @@
 import sublime
 import sublime_plugin
-import PrettyJSON.simplejson as json
-from PrettyJSON.simplejson import OrderedDict
 import decimal
+
+try:
+    # python 3 / Sublime Text 3
+    from . import simplejson as json
+    from .simplejson import OrderedDict
+except (ValueError):
+    # python 2 / Sublime Text 2
+    import simplejson as json
+    from simplejson import OrderedDict
 
 s = sublime.load_settings("Pretty JSON.sublime-settings")
 

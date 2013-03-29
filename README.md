@@ -35,5 +35,6 @@ You can change configuration key **indent** to string value "\t" or any other st
 Be sure "Indent Using Spaces" is unchecked otherwise you will not see effect and ST2 will convert it back to spaces.
 
 ## Thanks
-https://github.com/the3rdhbtaylor
-https://github.com/crcastle
+
+- @the3rdhbtaylor https://github.com/the3rdhbtaylor
+- @crcastle https://github.com/crcastle

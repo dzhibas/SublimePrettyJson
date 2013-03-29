@@ -1,16 +1,15 @@
 import sublime
 import sublime_plugin
-import json
-import sys
 import decimal
 
-if sys.version_info > (2, 7, 0):
-    import json
-    from collections import OrderedDict
-else:
+try:
+    # python 3 / Sublime Text 3
+    from . import simplejson as json
+    from .simplejson import OrderedDict
+except (ValueError):
+    # python 2 / Sublime Text 2
     import simplejson as json
     from simplejson import OrderedDict
-
 
 s = sublime.load_settings("Pretty JSON.sublime-settings")
 
@@ -38,5 +37,7 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                     separators=(',', ': '),
                     use_decimal=True))
 
-            except Exception, e:
-                sublime.status_message(str(e))
+            except Exception:
+                import sys
+                exc = sys.exc_info()[1]
+                sublime.status_message(str(exc))

@@ -14,15 +14,15 @@ Encoding basic Python object hierarchies::
     >>> import simplejson as json
     >>> json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
     '["foo", {"bar": ["baz", null, 1.0, 2]}]'
-    >>> print json.dumps("\"foo\bar")
+    >>> print(json.dumps("\"foo\bar"))
     "\"foo\bar"
-    >>> print json.dumps(u'\u1234')
+    >>> print(json.dumps(u'\u1234'))
     "\u1234"
-    >>> print json.dumps('\\')
+    >>> print(json.dumps('\\'))
     "\\"
-    >>> print json.dumps({"c": 0, "b": 0, "a": 0}, sort_keys=True)
+    >>> print(json.dumps({"c": 0, "b": 0, "a": 0}, sort_keys=True))
     {"a": 0, "b": 0, "c": 0}
-    >>> from StringIO import StringIO
+    >>> from simplejson.compat import StringIO
     >>> io = StringIO()
     >>> json.dump(['streaming API'], io)
     >>> io.getvalue()
@@ -31,14 +31,15 @@ Encoding basic Python object hierarchies::
 Compact encoding::
 
     >>> import simplejson as json
-    >>> json.dumps([1,2,3,{'4': 5, '6': 7}], separators=(',',':'))
+    >>> obj = [1,2,3,{'4': 5, '6': 7}]
+    >>> json.dumps(obj, separators=(',',':'), sort_keys=True)
     '[1,2,3,{"4":5,"6":7}]'
 
 Pretty printing::
 
     >>> import simplejson as json
     >>> s = json.dumps({'4': 5, '6': 7}, sort_keys=True, indent='    ')
-    >>> print '\n'.join([l.rstrip() for l in  s.splitlines()])
+    >>> print('\n'.join([l.rstrip() for l in  s.splitlines()]))
     {
         "4": 5,
         "6": 7
@@ -52,7 +53,7 @@ Decoding JSON::
     True
     >>> json.loads('"\\"foo\\bar"') == u'"foo\x08ar'
     True
-    >>> from StringIO import StringIO
+    >>> from simplejson.compat import StringIO
     >>> io = StringIO('["streaming API"]')
     >>> json.load(io)[0] == 'streaming API'
     True
@@ -97,7 +98,8 @@ Using simplejson.tool from the shell to validate and pretty-print::
     $ echo '{ 1.2:3.4}' | python -m simplejson.tool
     Expecting property name: line 1 column 2 (char 2)
 """
-__version__ = '2.5.2'
+from __future__ import absolute_import
+__version__ = '3.0.7'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'JSONDecoder', 'JSONDecodeError', 'JSONEncoder',
@@ -108,20 +110,20 @@ __author__ = 'Bob Ippolito <bob@redivi.com>'
 
 from decimal import Decimal
 
-from decoder import JSONDecoder, JSONDecodeError
-from encoder import JSONEncoder
+from .decoder import JSONDecoder, JSONDecodeError
+from .encoder import JSONEncoder, JSONEncoderForHTML
 def _import_OrderedDict():
     import collections
     try:
         return collections.OrderedDict
     except AttributeError:
-        import ordered_dict
+        from . import ordered_dict
         return ordered_dict.OrderedDict
 OrderedDict = _import_OrderedDict()
 
 def _import_c_make_encoder():
     try:
-        from simplejson._speedups import make_encoder
+        from ._speedups import make_encoder
         return make_encoder
     except ImportError:
         return None
@@ -469,9 +471,9 @@ def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
 
 
 def _toggle_speedups(enabled):
-    import simplejson.decoder as dec
-    import simplejson.encoder as enc
-    import simplejson.scanner as scan
+    from . import decoder as dec
+    from . import encoder as enc
+    from . import scanner as scan
     c_make_encoder = _import_c_make_encoder()
     if enabled:
         dec.scanstring = dec.c_scanstring or dec.py_scanstring

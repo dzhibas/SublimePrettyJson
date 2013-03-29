@@ -29,8 +29,8 @@ def main():
         obj = json.load(infile,
                         object_pairs_hook=json.OrderedDict,
                         use_decimal=True)
-    except ValueError, e:
-        raise SystemExit(e)
+    except ValueError:
+        raise SystemExit(sys.exc_info()[1])
     json.dump(obj, outfile, sort_keys=True, indent='    ', use_decimal=True)
     outfile.write('\n')
 

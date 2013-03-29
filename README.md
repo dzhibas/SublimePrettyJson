@@ -1,7 +1,7 @@
 Prettify JSON plugin for Sublime Text 2
 
 ## Installation
-Install this repository via [Package Control](http://wbond.net/sublime_packages/package_control)
+Install this sublime text package via [Package Control](http://wbond.net/sublime_packages/package_control)
 
 ## Usage
 To prettify JSON, make selection of json and press keys:

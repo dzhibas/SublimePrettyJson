@@ -6,9 +6,9 @@ Install this sublime text package via [Package Control](http://wbond.net/sublime
 ## Usage
 To prettify JSON, make selection of json and press keys:
 
-- Linux: `ctrl+alt+j`
-- Windows: `ctrl+alt+j`
-- OS X: `cmd+ctrl+j`
+- Linux: <kbd>ctrl+alt+j</kbd>
+- Windows: <kbd>ctrl+alt+j</kbd>
+- OS X: <kbd>cmd+ctrl+j</kbd>
 
 If selection is empty and configuration entry **use_entire_file_if_no_selection** is true, tries to prettify whole file.
 

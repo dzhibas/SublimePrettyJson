@@ -4,8 +4,8 @@ import decimal
 
 try:
     # python 3 / Sublime Text 3
-    from . import json as simplejson
-    from .simplejson import OrderedDict
+    from . import json as json
+    from .json import OrderedDict
 except (ValueError):
     # python 2 / Sublime Text 2
     import simplejson as json

@@ -41,3 +41,8 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                 import sys
                 exc = sys.exc_info()[1]
                 sublime.status_message(str(exc))
+
+
+def plugin_loaded():
+    global s
+    s = sublime.load_settings("Pretty JSON.sublime-settings")

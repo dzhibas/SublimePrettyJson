@@ -1,5 +1,12 @@
-import simplejson as json
-from simplejson import OrderedDict
+try:
+    # python 3 / Sublime Text 3
+    from . import simplejson as json
+    from .simplejson import OrderedDict
+except (ValueError):
+    # python 2 / Sublime Text 2
+    import simplejson as json
+    from simplejson import OrderedDict
+
 import decimal
 import unittest
 

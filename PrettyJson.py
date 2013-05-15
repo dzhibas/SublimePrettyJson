@@ -26,7 +26,13 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                 selection = region
 
             try:
-                obj = json.loads(self.view.substr(selection),
+                text = self.view.substr(selection)
+                text = text.replace("u'", " '") \
+                           .replace("'", '"') \
+                           .replace('True', 'true') \
+                           .replace('False', 'false') \
+                           .replace('None', 'null')
+                obj = json.loads(text,
                     object_pairs_hook=OrderedDict,
                     parse_float=decimal.Decimal)
 

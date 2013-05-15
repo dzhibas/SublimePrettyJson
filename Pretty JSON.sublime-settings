@@ -2,5 +2,12 @@
     "use_entire_file_if_no_selection" : true,
     "indent" : 2,
     "sort_keys" : false,
-    "ensure_ascii" : false
+    "ensure_ascii" : false,
+    "replace": [
+        ["u'", " '"],
+        ["'", "\""],
+        ["True", "true"],
+        ["False", "false"],
+        ["None", "null"]
+    ]
 }

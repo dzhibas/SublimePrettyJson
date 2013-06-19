@@ -20,10 +20,13 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
     """
     def run(self, edit):
         for region in self.view.sel():
+
+            selected_entire_file = False
+
             # If no selection, use the entire file as the selection
             if region.empty() and s.get("use_entire_file_if_no_selection", True):
                 selection = sublime.Region(0, self.view.size())
-                self.change_syntax()
+                selected_entire_file = True
             else:
                 selection = region
 
@@ -38,6 +41,9 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                                   sort_keys=s.get("sort_keys", False),
                                   separators=(',', ': '),
                                   use_decimal=True))
+
+                if selected_entire_file:
+                    self.change_syntax()
 
             except Exception:
                 import sys

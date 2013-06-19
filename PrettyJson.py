@@ -15,32 +15,40 @@ s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 
 class PrettyjsonCommand(sublime_plugin.TextCommand):
+
     """ Pretty Print JSON
     """
     def run(self, edit):
         for region in self.view.sel():
             # If no selection, use the entire file as the selection
-            if region.empty() and s.get("use_entire_file_if_no_selection"):
+            if region.empty() and s.get("use_entire_file_if_no_selection", True):
                 selection = sublime.Region(0, self.view.size())
+                self.change_syntax()
             else:
                 selection = region
 
             try:
                 obj = json.loads(self.view.substr(selection),
-                    object_pairs_hook=OrderedDict,
-                    parse_float=decimal.Decimal)
+                                 object_pairs_hook=OrderedDict,
+                                 parse_float=decimal.Decimal)
 
                 self.view.replace(edit, selection, json.dumps(obj,
-                    indent=s.get("indent", 2),
-                    ensure_ascii=s.get("ensure_ascii", False),
-                    sort_keys=s.get("sort_keys", False),
-                    separators=(',', ': '),
-                    use_decimal=True))
+                                  indent=s.get("indent", 2),
+                                  ensure_ascii=s.get("ensure_ascii", False),
+                                  sort_keys=s.get("sort_keys", False),
+                                  separators=(',', ': '),
+                                  use_decimal=True))
 
             except Exception:
                 import sys
                 exc = sys.exc_info()[1]
                 sublime.status_message(str(exc))
+
+    """Changes syntax to JSON if its in plain text
+    """
+    def change_syntax(self):
+        if "Plain text" in self.view.settings().get('syntax'):
+            self.view.set_syntax_file("Packages/JavaScript/JSON.tmLanguage")
 
 
 def plugin_loaded():

@@ -29,7 +29,7 @@ If JSON is not valid it will be displayed in status bar of sublime.
 You can change configuration key **indent** to string value "\t" or any other string.
 
 ```
-"indent_size" : "\t",
+"indent" : "\t",
 ```
 
 Be sure "Indent Using Spaces" is unchecked otherwise you will not see effect and ST2 will convert it back to spaces.

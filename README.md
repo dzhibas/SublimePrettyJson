@@ -24,6 +24,8 @@ If JSON is not valid it will be displayed in status bar of sublime.
 
 **ensure_ascii** - false
 
+**replace** - for autochange input text for correct json format
+
 ## Using tabs for indentation
 
 You can change configuration key **indent** to string value "\t" or any other string.

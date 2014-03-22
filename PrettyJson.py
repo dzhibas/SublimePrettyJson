@@ -35,8 +35,17 @@ class PrettyjsonCommand(sublime_plugin.TextCommand):
                                  object_pairs_hook=OrderedDict,
                                  parse_float=decimal.Decimal)
 
-                self.view.replace(edit, selection, json.dumps(obj,
+                text = self.view.substr(selection)
+
+                if len(text.split("\n")) == 1:
+                    self.view.replace(edit, selection, json.dumps(obj,
                                   indent=s.get("indent", 2),
+                                  ensure_ascii=s.get("ensure_ascii", False),
+                                  sort_keys=s.get("sort_keys", False),
+                                  separators=(',', ': '),
+                                  use_decimal=True))
+                else:
+                    self.view.replace(edit, selection, json.dumps(obj,
                                   ensure_ascii=s.get("ensure_ascii", False),
                                   sort_keys=s.get("sort_keys", False),
                                   separators=(',', ': '),

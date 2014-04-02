@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 import decimal
 import sys
+import re
 
 try:
     # python 3 / Sublime Text 3
@@ -31,8 +32,11 @@ s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 
 class PrettyJsonCommand(sublime_plugin.TextCommand):
+    json_error_matcher = re.compile(r"line (\d+) column (\d+) \(char (\d+)\)")
+
     """ Pretty Print JSON """
     def run(self, edit):
+        self.view.erase_regions('json_errors')
         for region in self.view.sel():
 
             selected_entire_file = False
@@ -62,6 +66,15 @@ class PrettyJsonCommand(sublime_plugin.TextCommand):
             except Exception:
                 exc = sys.exc_info()[1]
                 sublime.status_message(str(exc))
+                self.highlight_error(str(exc))
+
+    def highlight_error(self, message):
+        m = self.json_error_matcher.search(message)
+        if m:
+            line = int(m.group(1)) - 1
+            regions = [self.view.full_line(self.view.text_point(line, 0)), ]
+            self.view.add_regions('json_errors', regions, 'invalid', 'dot', sublime.DRAW_OUTLINED)
+            self.view.set_status('json_errors', message)
 
     def change_syntax(self):
         """ Changes syntax to JSON if its in plain text """
@@ -76,6 +89,7 @@ class UnPrettyJsonCommand(PrettyJsonCommand):
     """
     def run(self, edit):
         """ overwriting base class run function to remove intent """
+        self.view.erase_regions('json_errors')
         for region in self.view.sel():
 
             selected_entire_file = False
@@ -103,6 +117,7 @@ class UnPrettyJsonCommand(PrettyJsonCommand):
 
             except Exception:
                 exc = sys.exc_info()[1]
+                self.highlight_error(str(exc))
                 sublime.status_message(str(exc))
 
 

@@ -6,6 +6,11 @@ Prettify/Minify/Query JSON plugin for Sublime Text 2 & 3
 
 Install this sublime text package via [Package Control](https://sublime.wbond.net)
 
+### or manual installation
+
+- cd <Packages directory>
+- git clone https://github.com/dzhibas/SublimePrettyJson.git
+
 ## Usage
 
 To prettify JSON, make selection of json and press keys:

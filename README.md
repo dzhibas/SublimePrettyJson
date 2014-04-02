@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dzhibas/SublimePrettyJson.svg)](https://travis-ci.org/dzhibas/SublimePrettyJson)
+
 Prettify JSON plugin for Sublime Text 2 & 3
 
 ## Installation

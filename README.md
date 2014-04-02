@@ -4,7 +4,7 @@ Prettify JSON plugin for Sublime Text 2 & 3
 
 ## Installation
 
-Install this sublime text package via [Package Control](http://wbond.net/sublime_packages/package_control)
+Install this sublime text package via [Package Control](https://sublime.wbond.net)
 
 ## Usage
 

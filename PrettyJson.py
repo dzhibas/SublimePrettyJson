@@ -12,21 +12,22 @@ except (ValueError):
     import simplejson as json
     from simplejson import OrderedDict
 
-s = sublime.load_settings("Pretty JSON.sublime-settings")
-
 jq_exits = False
 jq_version = None
 
 import subprocess
 
 try:
-    # checking if jq tool is available in PATH so we can use it
+    # checking if ./jq tool is available so we can use it
     s = subprocess.Popen(["jq", "--version"], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = s.communicate()
     jq_version = err.decode("utf-8").replace("jq version ", "").strip()
     jq_exits = True
 except OSError:
     jq_exits = False
+
+
+s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 
 class PrettyJsonCommand(sublime_plugin.TextCommand):
@@ -107,12 +108,18 @@ class UnPrettyJsonCommand(PrettyJsonCommand):
 
 class JqPrettyJson(sublime_plugin.WindowCommand):
     """
-    Allows work with jq
+    Allows work with ./jq
     """
     def run(self):
-        self.window.show_input_panel("Enter JQ query", ".", on_done=self.done, on_change=None, on_cancel=None)
+        if jq_exits:
+            self.window.show_input_panel("Enter ./jq filter expression", ".", on_done=self.done, on_change=None, on_cancel=None)
+        else:
+            sublime.status_message("./jq tool is not available on your system. http://stedolan.github.io/jq")
 
     def get_content(self):
+        """
+        returns content of active view or selected region
+        """
         view = self.window.active_view()
         selection = ""
         for region in view.sel():

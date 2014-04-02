@@ -1,6 +1,6 @@
 [
     {
-        "caption": "Pretty JSON: Reformat (Pretty Print) JSON",
+        "caption": "Pretty JSON: Format (Pretty Print) JSON",
         "command": "pretty_json"
     },
     {
@@ -8,7 +8,7 @@
         "command": "un_pretty_json"
     },
     {
-        "caption": "Pretty JSON: Jq query",
+        "caption": "Pretty JSON: JSON query with ./jq",
         "command": "jq_pretty_json"
     }
 ]

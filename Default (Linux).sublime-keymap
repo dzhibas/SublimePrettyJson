@@ -3,6 +3,6 @@
         "keys": [
             "ctrl+alt+j"
         ], 
-        "command": "prettyjson"
+        "command": "pretty_json"
     }
 ]

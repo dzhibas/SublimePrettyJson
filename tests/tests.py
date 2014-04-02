@@ -1,11 +1,11 @@
-try:
-    # python 3 / Sublime Text 3
-    from . import simplejson as json
-    from .simplejson import OrderedDict
-except (ValueError):
-    # python 2 / Sublime Text 2
-    import simplejson as json
-    from simplejson import OrderedDict
+import sys
+import os
+
+# parent folder holds libraries which needs to be included
+sys.path.append(os.path.realpath('..'))
+
+import simplejson as json
+from simplejson import OrderedDict
 
 import decimal
 import unittest
@@ -19,7 +19,7 @@ class TestIssues(unittest.TestCase):
     def test_ascii_issue_10(self):
         tmp_str = '{"tempstr":"\u2022"}'
         expected_output = '''{
-  "tempstr": "\u2022"
+  "tempstr": "\\u2022"
 }'''
         obj = json.loads(tmp_str, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal)
         tmp_str = json.dumps(obj, indent=2, ensure_ascii=True, sort_keys=False,
@@ -66,6 +66,18 @@ class TestIssues(unittest.TestCase):
                     separators=(',', ': '),
                     use_decimal=True)
         self.assertEqual(tmp_str, expected_output)
+
+    def test_compress_feature(self):
+        tmp_str = """{
+  "real": 0.99
+}"""
+        expected_output = '{"real":0.99}'
+        obj = json.loads(tmp_str, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal)
+        tmp_str = json.dumps(obj, ensure_ascii=False, sort_keys=False,
+                    separators=(',', ':'),
+                    use_decimal=True)
+        self.assertEqual(tmp_str, expected_output)
+
 
 
 if __name__ == '__main__':

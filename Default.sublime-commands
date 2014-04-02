@@ -6,5 +6,9 @@
     {
         "caption": "Pretty JSON: Minify (compress) JSON",
         "command": "un_pretty_json"
+    },
+    {
+        "caption": "Pretty JSON: Jq query",
+        "command": "jq_pretty_json"
     }
 ]

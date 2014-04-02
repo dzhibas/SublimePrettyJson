@@ -24,6 +24,10 @@ If JSON is not valid it will be displayed in status bar of sublime.
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compress) JSON" this will make selection or full buffer as single line JSON which later you can use in command lines or somewhere else
 
+## jQ usage
+
+if on your machine "jq" tool is available with <kdb>ctrl+atl+shift+j</kdb> you can run against your json. output will be opened in new view
+
 ## Default configuration
 
 **use_entire_file_if_no_selection** - true

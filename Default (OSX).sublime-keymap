@@ -4,5 +4,9 @@
             "super+ctrl+j"
         ], 
         "command": "pretty_json"
+    },
+    {
+        "keys": ["super+ctrl+shift+j"],
+        "command": "jq_pretty_json"
     }
 ]

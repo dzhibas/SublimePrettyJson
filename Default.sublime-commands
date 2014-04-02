@@ -1,6 +1,10 @@
 [
     {
         "caption": "Pretty JSON: Reformat (Pretty Print) JSON",
-        "command": "prettyjson"
+        "command": "pretty_json"
+    },
+    {
+        "caption": "Pretty JSON: Minify (compress) JSON",
+        "command": "un_pretty_json"
     }
 ]

@@ -26,7 +26,11 @@ Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compres
 
 ## jQ usage
 
-if on your machine "jq" tool is available with <kdb>ctrl+atl+shift+j</kdb> you can run against your json. output will be opened in new view
+[![Demo](http://www.gang.lt/prettyjson.gif)](http://www.gang.lt/prettyjson.gif)
+
+if on your machine "[./jq](http://stedolan.github.io/jq/)" tool is available with <kdb>ctrl+atl+shift+j</kdb> you can run against your json. output will be opened in new view
+
+http://stedolan.github.io/jq/
 
 ## Default configuration
 

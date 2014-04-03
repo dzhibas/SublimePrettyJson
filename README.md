@@ -8,8 +8,8 @@ Install this sublime text package via [Package Control](https://sublime.wbond.ne
 
 ### or manual installation
 
-- cd <Packages directory>
-- git clone https://github.com/dzhibas/SublimePrettyJson.git
+- `cd <Packages directory>`
+- `git clone https://github.com/dzhibas/SublimePrettyJson.git`
 
 ## Usage
 
@@ -33,7 +33,7 @@ Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compres
 
 Demo:
 
-[![Demo](http://www.gang.lt/prettyjson.gif)](http://www.gang.lt/prettyjson.gif)
+[![Demo](http://i.imgur.com/sw7Hrsp.gif?1)](http://i.imgur.com/sw7Hrsp.gif?1)
 
 If on your machine "[./jq](http://stedolan.github.io/jq/)" tool is available with <kdb>ctrl+atl+shift+j</kdb> you can run against your json. output will be opened in new view so you can once again apply jq on new buffer
 

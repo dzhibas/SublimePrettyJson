@@ -65,3 +65,7 @@ Be sure "Indent Using Spaces" is unchecked otherwise you will not see effect and
 
 - @the3rdhbtaylor https://github.com/the3rdhbtaylor
 - @crcastle https://github.com/crcastle
+
+## Others
+
+If you YAMLing then maybe you interested in this plugin: https://github.com/aukaost/SublimePrettyYAML

@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 import decimal
 import sys
+import os
 import re
 
 try:
@@ -18,6 +19,10 @@ jq_version = None
 
 import subprocess
 
+""" for OSX we need to manually add brew bin path so jq can be found """
+if sys.platform != 'win32' and '/usr/local/bin' not in os.environ['PATH']:
+    os.environ["PATH"] += os.pathsep + '/usr/local/bin'
+
 try:
     # checking if ./jq tool is available so we can use it
     s = subprocess.Popen(["jq", "--version"], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -25,6 +30,8 @@ try:
     jq_version = err.decode("utf-8").replace("jq version ", "").strip()
     jq_exits = True
 except OSError:
+    os_exception = sys.exc_info()[1]
+    print(str(os_exception))
     jq_exits = False
 
 
@@ -151,7 +158,6 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
             raw_json = self.get_content()
             out, err = p.communicate(bytes(raw_json, "utf-8"))
             output = out.decode("UTF-8").strip()
-
             if output:
                 view = self.window.new_file()
                 view.run_command("jq_pretty_json_out", {"jq_output": output})

@@ -4,6 +4,8 @@ import decimal
 import sys
 import os
 import re
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 try:
     # python 3 / Sublime Text 3
@@ -166,6 +168,71 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
         except OSError:
             exc = sys.exc_info()[1]
             sublime.status_message(str(exc))
+
+
+class JsonToXml(PrettyJsonCommand):
+    """
+    converts Json to XML
+    """
+    def run(self, edit):
+        """ overwriting base class run function to remove intent """
+        self.view.erase_regions('json_errors')
+        for region in self.view.sel():
+
+            selected_entire_file = False
+
+            # If no selection, use the entire file as the selection
+            if region.empty() and s.get("use_entire_file_if_no_selection", True):
+                selection = sublime.Region(0, self.view.size())
+                selected_entire_file = True
+            else:
+                selection = region
+
+            try:
+                h = json.loads(self.view.substr(selection))
+                root = ET.Element("root")
+                root = self.traverse(root, h)
+
+                xml_string = "<?xml version='1.0' encoding='UTF-8' ?>"
+                rtn = ET.tostring(root, "utf-8", "xml")
+
+                if type(rtn) is bytes:
+                    rtn = rtn.decode("utf-8")
+
+                xml_string += rtn
+
+                xml_string = minidom.parseString(xml_string).toprettyxml(encoding="UTF-8")
+
+                if type(xml_string) is bytes:
+                    xml_string = xml_string.decode("utf-8")
+
+                self.view.replace(edit, selection, xml_string)
+
+                if selected_entire_file:
+                    self.change_syntax()
+
+            except Exception:
+                exc = sys.exc_info()[1]
+                self.highlight_error(str(exc))
+                sublime.status_message(str(exc))
+
+    def traverse(self, el, ha):
+        if type(ha) is dict and ha.keys():
+            for i in ha.keys():
+                e = ET.Element(i)
+                el.append(self.traverse(e, ha[i]))
+        elif type(ha) is list:
+            e_items = ET.Element('items')
+            for i in ha:
+                e_items.append(self.traverse(ET.Element('item'), i))
+            el.append(e_items)
+        else:
+            el.set('value', str(ha))
+
+        return el
+
+    def change_syntax(self):
+        self.view.set_syntax_file("Packages/XML/XML.tmLanguage")
 
 
 class JqPrettyJsonOut(sublime_plugin.TextCommand):

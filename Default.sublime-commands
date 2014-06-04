@@ -8,6 +8,10 @@
         "command": "un_pretty_json"
     },
     {
+        "caption": "Pretty JSON: JSON 2 XML",
+        "command": "json_to_xml"
+    },
+    {
         "caption": "Pretty JSON: JSON query with ./jq",
         "command": "jq_pretty_json"
     }

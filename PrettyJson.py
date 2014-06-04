@@ -199,15 +199,21 @@ class JsonToXml(PrettyJsonCommand):
                 root = ElementTree.Element("root")
                 root = self.traverse(root, h)
 
-                xml_string = "<?xml version='1.0' encoding='UTF-8' ?>"
-                rtn = ElementTree.tostring(root, "utf-8", "xml")
+                xml_string = "<?xml version='1.0' encoding='UTF-8' ?>\n"
+
+                if SUBLIME_MAJOR_VERSION < 3:
+                    self.indent_for_26(root)
+
+                rtn = ElementTree.tostring(root, "utf-8")
 
                 if type(rtn) is bytes:
                     rtn = rtn.decode("utf-8")
 
                 xml_string += rtn
 
-                xml_string = minidom.parseString(xml_string).toprettyxml(encoding="UTF-8")
+                # for some reason python 2.6 shipped with ST2 does not have pyexpat
+                if SUBLIME_MAJOR_VERSION >= 3:
+                    xml_string = minidom.parseString(xml_string).toprettyxml(encoding="UTF-8")
 
                 if type(xml_string) is bytes:
                     xml_string = xml_string.decode("utf-8")
@@ -221,6 +227,21 @@ class JsonToXml(PrettyJsonCommand):
                 exc = sys.exc_info()[1]
                 self.highlight_error(str(exc))
                 sublime.status_message(str(exc))
+
+    def indent_for_26(self, elem, level=0):
+        i = "\n" + level*"    "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "    "
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                self.indent_for_26(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
 
     def traverse(self, el, ha):
         if type(ha) is dict and ha.keys():

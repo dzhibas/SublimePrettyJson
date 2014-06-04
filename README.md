@@ -29,6 +29,10 @@ If JSON is not valid it will be displayed in status bar of Sublime Text
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compress) JSON" this will make selection or full buffer as single line JSON which later you can use in command lines (curl/httpie) or somewhere else...
 
+### Convert JSON to XML
+
+Using Command Palette <kbd>Ctrl+Shift+P</kbd> search fo "Pretty JSON: JSON 2 XML" this will convert your selected JSON of full buffer to XML and replace syntax and buffer to XML output
+
 ## ./jQ query/filter usage
 
 Demo:

@@ -4,17 +4,19 @@ import decimal
 import sys
 import os
 import re
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 from xml.dom import minidom
 
 try:
     # python 3 / Sublime Text 3
     from . import simplejson as json
     from .simplejson import OrderedDict
-except (ValueError):
+except ValueError:
     # python 2 / Sublime Text 2
     import simplejson as json
     from simplejson import OrderedDict
+
+SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
 
 jq_exits = False
 jq_version = None
@@ -136,7 +138,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
     """
     def run(self):
         if jq_exits:
-            self.window.show_input_panel("Enter ./jq filter expression", ".", on_done=self.done, on_change=None, on_cancel=None)
+            self.window.show_input_panel("Enter ./jq filter expression", ".", self.done, None, None)
         else:
             sublime.status_message("./jq tool is not available on your system. http://stedolan.github.io/jq")
 
@@ -158,7 +160,11 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
         try:
             p = subprocess.Popen(["jq", query], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             raw_json = self.get_content()
-            out, err = p.communicate(bytes(raw_json, "utf-8"))
+
+            if SUBLIME_MAJOR_VERSION < 3:
+                out, err = p.communicate(bytes(raw_json))
+            else:
+                out, err = p.communicate(bytes(raw_json, "utf-8"))
             output = out.decode("UTF-8").strip()
             if output:
                 view = self.window.new_file()
@@ -190,11 +196,11 @@ class JsonToXml(PrettyJsonCommand):
 
             try:
                 h = json.loads(self.view.substr(selection))
-                root = ET.Element("root")
+                root = ElementTree.Element("root")
                 root = self.traverse(root, h)
 
                 xml_string = "<?xml version='1.0' encoding='UTF-8' ?>"
-                rtn = ET.tostring(root, "utf-8", "xml")
+                rtn = ElementTree.tostring(root, "utf-8", "xml")
 
                 if type(rtn) is bytes:
                     rtn = rtn.decode("utf-8")
@@ -219,12 +225,12 @@ class JsonToXml(PrettyJsonCommand):
     def traverse(self, el, ha):
         if type(ha) is dict and ha.keys():
             for i in ha.keys():
-                e = ET.Element(i)
+                e = ElementTree.Element(i)
                 el.append(self.traverse(e, ha[i]))
         elif type(ha) is list:
-            e_items = ET.Element('items')
+            e_items = ElementTree.Element('items')
             for i in ha:
-                e_items.append(self.traverse(ET.Element('item'), i))
+                e_items.append(self.traverse(ElementTree.Element('item'), i))
             el.append(e_items)
         else:
             el.set('value', str(ha))

@@ -4,22 +4,22 @@ Prettify/Minify/Query JSON plugin for Sublime Text 2 & 3
 
 ## Installation
 
-Install this sublime text package via [Package Control](https://sublime.wbond.net)
+Install this sublime text 2/3 package via [Package Control](https://sublime.wbond.net)
 
-### or manual installation
+### or manually install
 
 - `cd <Packages directory>`
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git`
 
 ## Usage
 
-To prettify JSON, make selection of json and press keys:
+To prettify JSON, make selection of json (or else it will try to use full view buffer) and press keys:
 
 - Linux: <kbd>ctrl+alt+j</kbd>
 - Windows: <kbd>ctrl+alt+j</kbd>
 - OS X: <kbd>cmd+ctrl+j</kbd>
 
-or through Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Format (Pretty Print) JSON"
+or through Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Format (Pretty Print) JSON" (you can search for part of it like 'pretty format')
 
 If selection is empty and configuration entry **use_entire_file_if_no_selection** is true, tries to prettify whole file
 
@@ -27,11 +27,11 @@ If JSON is not valid it will be displayed in status bar of Sublime Text
 
 ### Compress / Minify JSON
 
-Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compress) JSON" this will make selection or full buffer as single line JSON which later you can use in command lines (curl/httpie) or somewhere else...
+Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compress) JSON" (you can search for part of it like 'json minify') this will make selection or full buffer as single line JSON which later you can use in command lines (curl/httpie) or somewhere else...
 
 ### Convert JSON to XML
 
-Using Command Palette <kbd>Ctrl+Shift+P</kbd> search fo "Pretty JSON: JSON 2 XML" this will convert your selected JSON of full buffer to XML and replace syntax and buffer to XML output
+Using Command Palette <kbd>Ctrl+Shift+P</kbd> search fo "Pretty JSON: JSON 2 XML" (you can search for part of it like '2XML') this will convert your selected JSON of full buffer to XML and replace syntax and buffer to XML output
 
 ## ./jQ query/filter usage
 

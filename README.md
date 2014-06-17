@@ -29,6 +29,12 @@ If JSON is not valid it will be displayed in status bar of Sublime Text
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compress) JSON" (you can search for part of it like 'json minify') this will make selection or full buffer as single line JSON which later you can use in command lines (curl/httpie) or somewhere else...
 
+To map a key combination like <kbd>Ctrl+Alt+M</kbd> to the Minify command, you can add a setting like this to your .sublime-keymap file (eg: `Packages/User/Default (Windows).sublime-keymap`):
+
+```
+  { "keys": [ "ctrl+alt+m" ], "command": "un_pretty_json" }
+```
+
 ### Convert JSON to XML
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> search fo "Pretty JSON: JSON 2 XML" (you can search for part of it like '2XML') this will convert your selected JSON of full buffer to XML and replace syntax and buffer to XML output

@@ -4,7 +4,7 @@ Prettify/Minify/Query JSON plugin for Sublime Text 2 & 3
 
 ## Installation
 
-Install this sublime text 2/3 package via [Package Control](https://sublime.wbond.net)
+Install this sublime text 2/3 package via [Package Control](https://sublime.wbond.net) search for package: "[**Pretty JSON**](https://sublime.wbond.net/packages/Pretty%20JSON)"
 
 ### or manually install
 

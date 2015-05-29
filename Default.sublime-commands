@@ -14,5 +14,9 @@
     {
         "caption": "Pretty JSON: JSON query with ./jq",
         "command": "jq_pretty_json"
+    },
+    {
+        "caption": "Pretty JSON: Validate",
+        "command": "pretty_json_validate"
     }
 ]

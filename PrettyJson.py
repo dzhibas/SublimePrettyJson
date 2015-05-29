@@ -77,6 +77,7 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
             regions = [self.view.full_line(self.view.text_point(line, 0)), ]
             self.view.add_regions('json_errors', regions, 'invalid', 'dot',
                                   sublime.DRAW_OUTLINED)
+            self.view.show(regions[0])
             self.view.set_status('json_errors', message)
 
     def show_exception(self):
@@ -88,6 +89,25 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
         """ Changes syntax to JSON if its in plain text """
         if "Plain text" in self.view.settings().get('syntax'):
             self.view.set_syntax_file("Packages/JavaScript/JSON.tmLanguage")
+
+
+class PrettyJsonValidate(PrettyJsonBaseCommand):
+    def run(self, edit):
+        self.view.erase_regions('json_errors')
+        for region in self.view.sel():
+            # If no selection, use the entire file as the selection
+            if region.empty() and s.get("use_entire_file_if_no_selection", True):
+                selection = sublime.Region(0, self.view.size())
+                selected_entire_file = True
+            else:
+                selection = region
+
+            try:
+                obj = self.json_loads(self.view.substr(selection))
+                sublime.message_dialog("JSON is Valid")
+            except Exception:
+                self.show_exception()
+                sublime.message_dialog("Invalid JSON")
 
 
 class PrettyJsonCommand(PrettyJsonBaseCommand):

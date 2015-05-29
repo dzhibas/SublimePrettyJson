@@ -25,6 +25,10 @@ If selection is empty and configuration entry **use_entire_file_if_no_selection*
 
 If JSON is not valid it will be displayed in status bar of Sublime Text
 
+### Validate JSON
+
+Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Validate" (you can search for partial string 'validate') this will validate selection or full file and will show in dialog if it's valid or invalid. In case of found errors view will jump to error and will highlight it
+
 ### Compress / Minify JSON
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> find "Pretty JSON: Minify (compress) JSON" (you can search for part of it like 'json minify') this will make selection or full buffer as single line JSON which later you can use in command lines (curl/httpie) or somewhere else...

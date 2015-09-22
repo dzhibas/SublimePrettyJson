@@ -15,7 +15,7 @@ Install this sublime text 2/3 package via [Package Control](https://sublime.wbon
 
 To prettify JSON, make selection of json (or else it will try to use full view buffer) and press keys:
 
-- Linux: <kbd>ctrl+alt+j</kbd>
+- Linux: <kbd>cmd+ctrl+j</kbd>
 - Windows: <kbd>ctrl+alt+j</kbd>
 - OS X: <kbd>cmd+ctrl+j</kbd>
 

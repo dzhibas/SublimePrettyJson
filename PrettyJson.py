@@ -19,7 +19,6 @@ except ValueError:
 SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
 
 jq_exits = False
-jq_version = None
 jq_init = False
 
 import subprocess
@@ -31,7 +30,6 @@ if sys.platform != 'win32' and '/usr/local/bin' not in os.environ['PATH']:
 """ defer jq presence check until the user tries to use it, include Package "Fix Mac Path" to resolve
     all homebrew issues (https://github.com/int3h/SublimeFixMacPath) """
 def check_jq():
-    global jq_version
     global jq_exits
     global jq_init
 
@@ -40,10 +38,10 @@ def check_jq():
         try:
             # checking if ./jq tool is available so we can use it
             s = subprocess.Popen(["jq", "--version"],
+                                 stdin=subprocess.PIPE,
                                  stderr=subprocess.PIPE,
                                  stdout=subprocess.PIPE)
             out, err = s.communicate()
-            jq_version = err.decode("utf-8").replace("jq version ", "").strip()
             jq_exits = True
         except OSError:
             os_exception = sys.exc_info()[1]

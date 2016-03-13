@@ -2,17 +2,26 @@
     {
         "keys": [
             "ctrl+alt+j"
-        ], 
-        "command": "pretty_json"
+        ],
+        "command": "pretty_json",
+        "context": [
+            { "key": "selector", "operator": "equal", "operand": "source.json" }
+        ]
     },
     {
         "keys": [
             "ctrl+alt+m"
-        ], 
-        "command": "un_pretty_json"
+        ],
+        "command": "un_pretty_json",
+        "context": [
+            { "key": "selector", "operator": "equal", "operand": "source.json" }
+        ]
     },
     {
         "keys": ["ctrl+alt+shift+j"],
-        "command": "jq_pretty_json"
+        "command": "jq_pretty_json",
+        "context": [
+            { "key": "selector", "operator": "equal", "operand": "source.json" }
+        ]
     }
 ]

@@ -65,6 +65,10 @@ http://stedolan.github.io/jq/
 
 **ensure_ascii** - false
 
+**line_separator** - ","
+
+**value_separator** - ": "
+
 ## Using tabs for indentation
 
 You can change configuration key **indent** to string value "\t" or any other string

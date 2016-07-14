@@ -71,6 +71,8 @@ http://stedolan.github.io/jq/
 
 **keep_arrays_single_line** - false
 
+**max_arrays_line_length** - 120
+
 ## Using tabs for indentation
 
 You can change configuration key **indent** to string value "\t" or any other string

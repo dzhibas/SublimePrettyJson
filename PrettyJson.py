@@ -90,7 +90,7 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
                 items = [a.strip() for a in m.split(line_separator.strip())]
                 replacement = join_separator.join(items)
                 # if line not gets too long, replace with single line
-                if len(replacement) <= 120:
+                if len(replacement) <= s.get("max_arrays_line_length", 120):
                     output_json = output_json.replace(m, replacement)
 
         return output_json

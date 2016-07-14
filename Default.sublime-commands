@@ -18,5 +18,19 @@
     {
         "caption": "Pretty JSON: Validate",
         "command": "pretty_json_validate"
+    },
+    {
+        "caption": "Preferences: Pretty JSON Settings - User",
+        "command": "open_file", "args":
+        {
+            "file": "${packages}/User/Pretty JSON.sublime-settings"
+        }
+    },
+    {
+        "caption": "Preferences: Pretty JSON Settings - Default",
+        "command": "open_file", "args":
+        {
+            "file": "${packages}/SublimePrettyJson/Pretty JSON.sublime-settings"
+        }
     }
 ]

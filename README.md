@@ -69,6 +69,8 @@ http://stedolan.github.io/jq/
 
 **value_separator** - ": "
 
+**keep_arrays_single_line** - false
+
 ## Using tabs for indentation
 
 You can change configuration key **indent** to string value "\t" or any other string

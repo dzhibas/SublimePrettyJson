@@ -4,5 +4,6 @@
     "sort_keys": false,
     "ensure_ascii": false,
     "line_separator": ",",
-    "value_separator": ": "
+    "value_separator": ": ",
+    "keep_arrays_single_line": false
 }

@@ -69,12 +69,31 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
         if PrettyJsonBaseCommand.force_sorting:
             sort_keys = True
 
-        return json.dumps(obj,
-                          indent=s.get("indent", 2),
-                          ensure_ascii=s.get("ensure_ascii", False),
-                          sort_keys=sort_keys,
-                          separators=(s.get("line_separator", ","), s.get("value_separator", ": ")),
-                          use_decimal=True)
+        line_separator = s.get("line_separator", ",")
+        value_separator = s.get("value_separator", ": ")
+
+        output_json = json.dumps(obj,
+                                 indent=s.get("indent", 2),
+                                 ensure_ascii=s.get("ensure_ascii", False),
+                                 sort_keys=sort_keys,
+                                 separators=(line_separator, value_separator),
+                                 use_decimal=True)
+
+        # do we need try and shuffle things around ?
+        post_process = s.get("keep_arrays_single_line", False)
+
+        if post_process:
+            # find all array matches
+            matches = re.findall(r"\[([^\[\]]+?)\]", output_json)
+            join_separator = line_separator.ljust(2)
+            for m in matches:
+                items = [a.strip() for a in m.split(line_separator.strip())]
+                replacement = join_separator.join(items)
+                # if line not gets too long, replace with single line
+                if len(replacement) <= 120:
+                    output_json = output_json.replace(m, replacement)
+
+        return output_json
 
     @staticmethod
     def json_dumps_minified(obj):

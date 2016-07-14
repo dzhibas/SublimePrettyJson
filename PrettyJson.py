@@ -53,7 +53,7 @@ s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 
 class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
-    json_error_matcher = re.compile(r"line (\d+) column (\d+) \(char (\d+)\)")
+    json_error_matcher = re.compile(r"line (\d+)")
     force_sorting = False
 
     @staticmethod
@@ -116,6 +116,12 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
         m = self.json_error_matcher.search(message)
         if m:
             line = int(m.group(1)) - 1
+
+            # sometime we need to highlight one line above
+            if ("','" in message and "delimiter" in message) \
+                    or "control character '\\n'" in message:
+                line -= 1
+
             regions = [self.view.full_line(self.view.text_point(line, 0)), ]
             self.view.add_regions('json_errors', regions, 'invalid', 'dot',
                                   sublime.DRAW_OUTLINED)

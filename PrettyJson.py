@@ -175,14 +175,26 @@ class PrettyJsonCommand(PrettyJsonBaseCommand):
                 selection = region
 
             try:
-                obj = self.json_loads(self.view.substr(selection))
+                selection_text = self.view.substr(selection)
+                obj = self.json_loads(selection_text)
                 self.view.replace(edit, selection, self.json_dumps(obj))
 
                 if selected_entire_file:
                     self.change_syntax()
 
             except Exception:
-                self.show_exception()
+                amount_of_single_quotes = re.findall(r"(\'[^\']+\'?)", selection_text)
+                amount_of_double_quotes = re.findall(r"(\"[^\"]+\"?)", selection_text)
+
+                if len(amount_of_single_quotes) >= len(amount_of_double_quotes):
+                    selection_text_modified = re.sub(r"(?:\'([^\']+)\'?)", r'"\1"', selection_text)
+                    obj = self.json_loads(selection_text_modified)
+                    self.view.replace(edit, selection, self.json_dumps(obj))
+
+                    if selected_entire_file:
+                        self.change_syntax()
+                else:
+                    self.show_exception()
 
 
 class PrettyJsonAndSortCommand(PrettyJsonCommand):

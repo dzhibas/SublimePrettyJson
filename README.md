@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/dzhibas/SublimePrettyJson.svg)](https://travis-ci.org/dzhibas/SublimePrettyJson)
 
-Prettify/Minify/Query JSON plugin for Sublime Text 2 & 3
+Prettify/Minify/Query/Validate/Lint JSON plugin for Sublime Text 2 & 3
 
 ## Installation
 

@@ -1,6 +1,8 @@
 {
-    "use_entire_file_if_no_selection" : true,
-    "indent" : 2,
-    "sort_keys" : false,
-    "ensure_ascii" : false
+    "use_entire_file_if_no_selection": true,
+    "indent": 2,
+    "sort_keys": false,
+    "ensure_ascii": false,
+    "line_separator": ",",
+    "value_separator": ": "
 }

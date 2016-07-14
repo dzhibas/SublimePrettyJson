@@ -67,15 +67,20 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
                           indent=s.get("indent", 2),
                           ensure_ascii=s.get("ensure_ascii", False),
                           sort_keys=s.get("sort_keys", False),
-                          separators=(',', ': '),
+                          separators=(s.get("line_separator", ","), s.get("value_separator", ": ")),
                           use_decimal=True)
 
     @staticmethod
     def json_dumps_minified(obj):
+        line_separator = s.get("line_separator", ",")
+        """:type : str"""
+        value_separator = s.get("value_separator", ": ")
+        """:type : str"""
+
         return json.dumps(obj,
                           ensure_ascii=s.get("ensure_ascii", False),
                           sort_keys=s.get("sort_keys", False),
-                          separators=(',', ':'),
+                          separators=(line_separator.strip(), value_separator.strip()),
                           use_decimal=True)
 
     def highlight_error(self, message):

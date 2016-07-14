@@ -54,6 +54,7 @@ s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
     json_error_matcher = re.compile(r"line (\d+) column (\d+) \(char (\d+)\)")
+    force_sorting = False
 
     @staticmethod
     def json_loads(selection):
@@ -63,10 +64,15 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
 
     @staticmethod
     def json_dumps(obj):
+
+        sort_keys = s.get("sort_keys", False)
+        if PrettyJsonBaseCommand.force_sorting:
+            sort_keys = True
+
         return json.dumps(obj,
                           indent=s.get("indent", 2),
                           ensure_ascii=s.get("ensure_ascii", False),
-                          sort_keys=s.get("sort_keys", False),
+                          sort_keys=sort_keys,
                           separators=(s.get("line_separator", ","), s.get("value_separator", ": ")),
                           use_decimal=True)
 
@@ -77,9 +83,13 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
         value_separator = s.get("value_separator", ": ")
         """:type : str"""
 
+        sort_keys = s.get("sort_keys", False)
+        if PrettyJsonBaseCommand.force_sorting:
+            sort_keys = True
+
         return json.dumps(obj,
                           ensure_ascii=s.get("ensure_ascii", False),
-                          sort_keys=s.get("sort_keys", False),
+                          sort_keys=sort_keys,
                           separators=(line_separator.strip(), value_separator.strip()),
                           use_decimal=True)
 
@@ -148,6 +158,15 @@ class PrettyJsonCommand(PrettyJsonBaseCommand):
 
             except Exception:
                 self.show_exception()
+
+
+class PrettyJsonAndSortCommand(PrettyJsonCommand):
+
+    """ Pretty print json with forced sorting """
+    def run(self, edit):
+        PrettyJsonBaseCommand.force_sorting = True
+        PrettyJsonCommand.run(self, edit)
+        PrettyJsonBaseCommand.force_sorting = False
 
 
 class UnPrettyJsonCommand(PrettyJsonBaseCommand):

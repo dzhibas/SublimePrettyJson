@@ -7,6 +7,8 @@ try:
 except ValueError:
     from PrettyJson import PrettyJsonBaseCommand
 
+s = sublime.load_settings("Pretty JSON.sublime-settings")
+
 
 class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand):
     def on_post_save(self, view):
@@ -23,3 +25,10 @@ class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand
                 self.json_loads(json_content)
             except Exception:
                 self.show_exception()
+
+
+class PrettyJsonAutoPrettyOnSaveListener(sublime_plugin.EventListener):
+    def on_pre_save(self, edit):
+        auto_pretty = s.get("pretty_on_save", False)
+        if auto_pretty:
+            sublime.active_window().run_command('pretty_json')

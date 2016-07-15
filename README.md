@@ -77,6 +77,9 @@ http://stedolan.github.io/jq/
 **max_arrays_line_length** - 120 
 `if array for example '["a", "b", 123213, ....]' length will reach max it will be kept multi-line (for beauty)`
 
+**pretty_on_save** - false
+`do we need to automatically Pretty JSON on save`
+
 ## Using tabs for indentation
 
 You can change configuration key **indent** to string value "\t" or any other string

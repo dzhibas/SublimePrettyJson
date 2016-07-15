@@ -124,13 +124,13 @@ class PrettyJsonBaseCommand:
             # sometime we need to highlight one line above
             if "','" in message and "delimiter" in message:
                 line_content = self.view.substr(self.view.full_line(self.view.text_point(line - 1, 0)))
-                if line_content.strip()[-1] != ',':
+                if line_content.strip()[-1] != ',' and line_content.strip() != '{' and line_content.strip() != '}':
                     line -= 1
 
             if "control character '\\n'" in message:
                 line_content = self.view.substr(self.view.full_line(self.view.text_point(line - 1, 0)))
                 quotes = re.findall(r"\"", line_content)
-                if len(quotes) % 2 != 0:
+                if len(quotes) % 2 != 0 and len(quotes) != 0:
                     line -= 1
 
             regions = [self.view.full_line(self.view.text_point(line, 0)), ]

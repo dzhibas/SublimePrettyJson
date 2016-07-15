@@ -52,7 +52,7 @@ def check_jq():
 s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 
-class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
+class PrettyJsonBaseCommand:
     json_error_matcher = re.compile(r"line (\d+)")
     force_sorting = False
 
@@ -113,16 +113,28 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
                           use_decimal=True)
 
     def highlight_error(self, message):
+
+        self.view.erase_regions('json_errors')
+        self.view.erase_status('json_errors')
+
         m = self.json_error_matcher.search(message)
         if m:
             line = int(m.group(1)) - 1
 
             # sometime we need to highlight one line above
-            if ("','" in message and "delimiter" in message) \
-                    or "control character '\\n'" in message:
-                line -= 1
+            if "','" in message and "delimiter" in message:
+                line_content = self.view.substr(self.view.full_line(self.view.text_point(line - 1, 0)))
+                if line_content.strip()[-1] != ',':
+                    line -= 1
+
+            if "control character '\\n'" in message:
+                line_content = self.view.substr(self.view.full_line(self.view.text_point(line - 1, 0)))
+                quotes = re.findall(r"\"", line_content)
+                if len(quotes) % 2 != 0:
+                    line -= 1
 
             regions = [self.view.full_line(self.view.text_point(line, 0)), ]
+
             self.view.add_regions('json_errors', regions, 'invalid', 'dot',
                                   sublime.DRAW_OUTLINED)
             self.view.show(regions[0])
@@ -139,7 +151,7 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
             self.view.set_syntax_file("Packages/JavaScript/JSON.tmLanguage")
 
 
-class PrettyJsonValidate(PrettyJsonBaseCommand):
+class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.erase_regions('json_errors')
         for region in self.view.sel():
@@ -158,7 +170,24 @@ class PrettyJsonValidate(PrettyJsonBaseCommand):
                 sublime.message_dialog("Invalid JSON")
 
 
-class PrettyJsonCommand(PrettyJsonBaseCommand):
+class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand):
+    def on_post_save(self, view):
+        # will work only in json syntax
+        if "JSON" in view.settings().get('syntax'):
+            self.view = view
+
+            self.view.erase_regions('json_errors')
+            self.view.erase_status('json_errors')
+
+            json_content = self.view.substr(sublime.Region(0, view.size()))
+
+            try:
+                self.json_loads(json_content)
+            except Exception:
+                self.show_exception()
+
+
+class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
     """ Pretty Print JSON """
     def run(self, edit):
@@ -197,7 +226,7 @@ class PrettyJsonCommand(PrettyJsonBaseCommand):
                     self.show_exception()
 
 
-class PrettyJsonAndSortCommand(PrettyJsonCommand):
+class PrettyJsonAndSortCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
 
     """ Pretty print json with forced sorting """
     def run(self, edit):
@@ -206,7 +235,7 @@ class PrettyJsonAndSortCommand(PrettyJsonCommand):
         PrettyJsonBaseCommand.force_sorting = False
 
 
-class UnPrettyJsonCommand(PrettyJsonBaseCommand):
+class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
     """ Compress/minify JSON - it makes json as one-liner """
     def run(self, edit):
@@ -284,7 +313,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
             sublime.status_message(str(exc))
 
 
-class JsonToXml(PrettyJsonBaseCommand):
+class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     """
     converts Json to XML
     """

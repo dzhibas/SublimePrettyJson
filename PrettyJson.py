@@ -8,6 +8,11 @@ from xml.etree import ElementTree
 from xml.dom import minidom
 
 try:
+  basestring
+except NameError:
+  basestring = str
+
+try:
     # python 3 / Sublime Text 3
     from . import simplejson as json
     from .simplejson import OrderedDict
@@ -412,7 +417,7 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
                 self.generate_items(json_data[key], new_key_name)
         elif isinstance(json_data, list):
             for index, item in enumerate(json_data):
-                if isinstance(item, str):
+                if isinstance(item, basestring):
                     self.items.append('%s' % root_key + '.' + item)
                     self.goto_items.append('"%s"' % item)
 

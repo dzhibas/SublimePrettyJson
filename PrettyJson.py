@@ -170,23 +170,6 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 sublime.message_dialog("Invalid JSON")
 
 
-class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand):
-    def on_post_save(self, view):
-        # will work only in json syntax
-        if "JSON" in view.settings().get('syntax'):
-            self.view = view
-
-            self.view.erase_regions('json_errors')
-            self.view.erase_status('json_errors')
-
-            json_content = self.view.substr(sublime.Region(0, view.size()))
-
-            try:
-                self.json_loads(json_content)
-            except Exception:
-                self.show_exception()
-
-
 class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
     """ Pretty Print JSON """
@@ -404,6 +387,58 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 class JqPrettyJsonOut(sublime_plugin.TextCommand):
     def run(self, edit, jq_output=''):
         self.view.insert(edit, 0, jq_output)
+
+
+class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.items = []
+        self.goto_items = []
+
+        content = self.view.substr(sublime.Region(0, self.view.size()))
+
+        try:
+            json_data = self.json_loads(content)
+            self.generate_items(json_data, '')
+            sublime.active_window().show_quick_panel(self.items, self.goto)
+        except Exception:
+            self.show_exception()
+
+    def generate_items(self, json_data, root_key):
+        if isinstance(json_data, OrderedDict):
+            for key in json_data:
+                new_key_name = root_key + '.' + key
+                self.items.append('%s' % new_key_name)
+                self.goto_items.append('"%s"' % key)
+                self.generate_items(json_data[key], new_key_name)
+        elif isinstance(json_data, list):
+            for index, item in enumerate(json_data):
+                if isinstance(item, str):
+                    self.items.append('%s' % root_key + '.' + item)
+                    self.goto_items.append('"%s"' % item)
+
+    def goto(self, pos):
+        string_to_search = self.goto_items[pos]
+
+        found = 0
+        for index, item in enumerate(self.goto_items):
+            if index >= pos:
+                break
+            if item == string_to_search:
+                found += 1
+
+        regions = self.view.find_all(string_to_search, sublime.LITERAL)
+        for i, r in enumerate(regions):
+            line = self.view.substr(self.view.full_line(r))
+            if ":" in line:
+                split = line.split(":")
+                val = split[1].strip()
+                if string_to_search in val:
+                    del regions[i]
+
+        region = regions[found]
+        self.view.sel().clear()
+        self.view.sel().add(region)
+        self.view.show(region)
 
 
 def plugin_loaded():

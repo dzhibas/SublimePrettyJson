@@ -80,6 +80,9 @@ http://stedolan.github.io/jq/
 **pretty_on_save** - false
 `do we need to automatically Pretty JSON on save`
 
+**validate_on_save** - true
+`do we need validate JSON files on each save`
+
 ## Using tabs for indentation
 
 You can change configuration key **indent** to string value "\t" or any other string

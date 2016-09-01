@@ -8,7 +8,7 @@ Install this sublime text 2/3 package via [Package Control](https://sublime.wbon
 
 ### or manually install
 
-- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application Support/<Sublime Text Version>/Packages`)
+- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git`
 
 ## Usage

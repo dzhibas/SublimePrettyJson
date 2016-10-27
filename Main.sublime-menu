@@ -1,31 +1,31 @@
 [
     {
-        "mnemonic": "n", 
-        "caption": "Preferences", 
-        "id": "preferences", 
+        "mnemonic": "n",
+        "caption": "Preferences",
+        "id": "preferences",
         "children": [
             {
-                "mnemonic": "P", 
-                "caption": "Package Settings", 
-                "id": "package-settings", 
+                "mnemonic": "P",
+                "caption": "Package Settings",
+                "id": "package-settings",
                 "children": [
                     {
-                        "caption": "Pretty JSON", 
+                        "caption": "Pretty JSON",
                         "children": [
                             {
-                                "caption": "Settings – Default", 
+                                "caption": "Settings – Default",
                                 "args": {
-                                    "file": "${packages}/Pretty JSON/Pretty JSON.sublime-settings"
-                                }, 
+                                    "file": "${packages}/PrettyJSON/PrettyJSON.sublime-settings"
+                                },
                                 "command": "open_file"
-                            }, 
+                            },
                             {
-                                "caption": "Settings – User", 
+                                "caption": "Settings – User",
                                 "args": {
-                                    "file": "${packages}/User/Pretty JSON.sublime-settings"
-                                }, 
+                                    "file": "${packages}/User/PrettyJSON.sublime-settings"
+                                },
                                 "command": "open_file"
-                            }, 
+                            },
                             {
                                 "caption": "-"
                             }

@@ -54,7 +54,7 @@ def check_jq():
             jq_exits = False
 
 
-s = sublime.load_settings("Pretty JSON.sublime-settings")
+s = sublime.load_settings("PrettyJSON.sublime-settings")
 
 
 class PrettyJsonBaseCommand:
@@ -448,4 +448,4 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
 
 def plugin_loaded():
     global s
-    s = sublime.load_settings("Pretty JSON.sublime-settings")
+    s = sublime.load_settings("PrettyJSON.sublime-settings")

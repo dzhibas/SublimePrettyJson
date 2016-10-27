@@ -7,7 +7,7 @@ try:
 except ValueError:
     from PrettyJson import PrettyJsonBaseCommand
 
-s = sublime.load_settings("Pretty JSON.sublime-settings")
+s = sublime.load_settings("PrettyJSON.sublime-settings")
 
 
 class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand):

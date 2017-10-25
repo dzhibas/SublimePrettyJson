@@ -14,7 +14,8 @@ class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand
     def on_post_save(self, view):
         # will work only in json syntax and once validate_on_save setting is true
         validate = s.get("validate_on_save", True)
-        if validate and "JSON" in view.settings().get('syntax'):
+        as_json = s.get("as_json", ["JSON"])
+        if validate and any(syntax in view.settings().get("syntax") for syntax in as_json):
             self.view = view
 
             self.view.erase_regions('json_errors')

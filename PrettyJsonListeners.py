@@ -31,5 +31,6 @@ class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand
 class PrettyJsonAutoPrettyOnSaveListener(sublime_plugin.EventListener):
     def on_pre_save(self, view):
         auto_pretty = s.get("pretty_on_save", False)
-        if auto_pretty and "JSON" in view.settings().get('syntax'):
+        as_json = s.get("as_json", ["JSON"])
+        if auto_pretty and any(syntax in view.settings().get("syntax") for syntax in as_json):
             sublime.active_window().run_command('pretty_json')

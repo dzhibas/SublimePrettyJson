@@ -56,7 +56,6 @@ def check_jq():
 
 s = sublime.load_settings("Pretty JSON.sublime-settings")
 
-
 class PrettyJsonBaseCommand:
     json_error_matcher = re.compile(r"line (\d+)")
     force_sorting = False
@@ -117,6 +116,20 @@ class PrettyJsonBaseCommand:
                           separators=(line_separator.strip(), value_separator.strip()),
                           use_decimal=True)
 
+    def reindent(self, text, selection):
+        current_line = self.view.line(selection.begin())
+        space_number = sublime.Region(current_line.begin(), selection.begin()).size()
+        indent_space = " " * space_number
+        lines = text.split('\n')
+
+        i = 1
+        while (i < len(lines)):
+            lines[i] = indent_space + lines[i]
+            i += 1
+
+        return "\n".join(lines)
+
+
     def highlight_error(self, message):
 
         self.view.erase_regions('json_errors')
@@ -176,7 +189,6 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
 
 class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
-
     """ Pretty Print JSON """
     def run(self, edit):
         self.view.erase_regions('json_errors')
@@ -194,7 +206,13 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             try:
                 selection_text = self.view.substr(selection)
                 obj = self.json_loads(selection_text)
-                self.view.replace(edit, selection, self.json_dumps(obj))
+
+                json_text = self.json_dumps(obj)
+
+                if not selected_entire_file and s.get("reindent_block", False):
+                    json_text = self.reindent(json_text, selection)
+
+                self.view.replace(edit, selection, json_text)
 
                 if selected_entire_file:
                     self.change_syntax()
@@ -206,7 +224,14 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 if len(amount_of_single_quotes) >= len(amount_of_double_quotes):
                     selection_text_modified = re.sub(r"(?:\'([^\']+)\'?)", r'"\1"', selection_text)
                     obj = self.json_loads(selection_text_modified)
-                    self.view.replace(edit, selection, self.json_dumps(obj))
+
+                    json_text = self.json_dumps(obj)
+
+                    if not selected_entire_file and s.get("reindent_block", False):
+                        json_text = self.reindent(json_text, selection)
+
+                    self.view.replace(edit, selection, json_text)
+
 
                     if selected_entire_file:
                         self.change_syntax()
@@ -343,6 +368,10 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
                 if type(xml_string) is bytes:
                     xml_string = xml_string.decode("utf-8")
+
+
+                if not selected_entire_file and s.get("reindent_block", False):
+                    xml_string = self.reindent(xml_string, selection)
 
                 self.view.replace(edit, selection, xml_string)
 

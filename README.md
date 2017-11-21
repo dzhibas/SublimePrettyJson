@@ -60,7 +60,8 @@ http://stedolan.github.io/jq/
 **use_entire_file_if_no_selection** - true
 
 **indent** - 2
-`int used for how many spaces to use for indent, replace it with value "\t" and tabs will be used instead`
+
+    int used for how many spaces to use for indent, replace it with value "\t" and tabs will be used instead
 
 **sort_keys** - false
 
@@ -69,19 +70,53 @@ http://stedolan.github.io/jq/
 **line_separator** - ","
 
 **value_separator** - ": "
-`value separator in config, so if you need to get rid of extra space you can remove it with this param`
+
+    value separator in config, so if you need to get rid of extra space you can remove it with this param
 
 **keep_arrays_single_line** - false
-`if we need to re-structure arrays and make them single-line`
+
+    if we need to re-structure arrays and make them single-line
 
 **max_arrays_line_length** - 120 
-`if array for example '["a", "b", 123213, ....]' length will reach max it will be kept multi-line (for beauty)`
+
+    if array for example '["a", "b", 123213, ....]' length will reach max it will be kept multi-line (for beauty)
 
 **pretty_on_save** - false
-`do we need to automatically Pretty JSON on save`
+
+    do we need to automatically Pretty JSON on save
 
 **validate_on_save** - true
-`do we need validate JSON files on each save`
+
+    do we need validate JSON files on each save
+
+**reindent_block** - false
+
+    if we are formatting a selection, if we need to reindent the
+    resulting block to follow the flow of the source document
+    the posible values are 'minimal' and 'start'
+
+    using `minimal`, the resulting json lines are indented as much
+    spaces as the line where the selection starts. e.g
+
+        yaml_container:
+          yaml_key: { "json": "value" }
+
+    gets formatted as:
+
+        yaml_container:
+            yaml_key: {
+              "json": "value"
+            }
+
+    using `start`, the resulting json lines are indented a number
+    of spaces equal to the column number of the start of the selection
+
+    with `start` the previous example gets formatted as:
+
+        yaml_container:
+            yaml_key: {
+                        "json": "value"
+                      }
 
 ## Using tabs for indentation
 

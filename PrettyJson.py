@@ -118,10 +118,27 @@ class PrettyJsonBaseCommand:
 
     def reindent(self, text, selection):
         current_line = self.view.line(selection.begin())
-        space_number = sublime.Region(current_line.begin(), selection.begin()).size()
-        indent_space = " " * space_number
+        text_before_sel = sublime.Region(
+            current_line.begin(), selection.begin())
+
+        reindent_mode = s.get('reindent_block', 'minimal')
+
+        if reindent_mode == 'start':
+            # Reindent to the column where the selection starts
+            space_number = text_before_sel.size()
+            indent_space = " " * space_number
+        else:
+            # Reindent to the number of spaces to the left of the
+            # line where the selection starts
+
+            # Extracts the spaces at the start of the line to use them
+            # as padding
+            indent_space = re.search(
+                '^\s*', self.view.substr(text_before_sel)).group(0)
+
         lines = text.split('\n')
 
+        # Pad every line except the first one
         i = 1
         while (i < len(lines)):
             lines[i] = indent_space + lines[i]

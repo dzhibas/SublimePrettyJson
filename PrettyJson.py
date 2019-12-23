@@ -96,7 +96,7 @@ class PrettyJsonBaseCommand:
                 replacement = join_separator.join(items)
                 # if line not gets too long, replace with single line
                 if len(replacement) <= s.get("max_arrays_line_length", 120):
-                    output_json = output_json.replace(m, replacement)
+                    output_json = output_json.replace(m, replacement, 1)
 
         return output_json
 

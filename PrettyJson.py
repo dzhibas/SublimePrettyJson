@@ -320,7 +320,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
                     out, err = p.communicate(unicode(raw_json).encode("utf-8"))
             else:
                 out, err = p.communicate(bytes(raw_json, "utf-8"))
-            output = out.decode("UTF-8").strip()
+            output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
             if output:
                 view = self.window.new_file()
                 view.run_command("jq_pretty_json_out", {"jq_output": output})

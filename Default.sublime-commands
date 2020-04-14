@@ -1,6 +1,6 @@
 [
     {
-        "caption": "Pretty JSON: Format (Pretty Print) JSON",
+        "caption": "Pretty JSON: Format JSON",
         "command": "pretty_json"
     },
     {
@@ -8,7 +8,7 @@
         "command": "pretty_json_and_sort"
     },
     {
-        "caption": "Pretty JSON: Minify (compress) JSON",
+        "caption": "Pretty JSON: Minify JSON",
         "command": "un_pretty_json"
     },
     {

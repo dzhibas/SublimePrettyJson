@@ -12,18 +12,10 @@ import sublime_plugin
 from . import simplejson as json
 from .simplejson import OrderedDict
 
-try:
-    basestring
-except NameError:
-    basestring = str
-
-
 SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
 
 xml_syntax = "Packages/XML/XML.tmLanguage"
 json_syntax = "Packages/JSON/JSON.tmLanguage"
-if SUBLIME_MAJOR_VERSION < 4:
-    json_syntax = "Packages/JavaScript/JSON.tmLanguage"
 
 
 jq_exists = False
@@ -165,10 +157,9 @@ class PrettyJsonBaseCommand:
             self.view.show(regions[0])
             self.view.set_status("json_errors", message)
 
-    def show_exception(self):
-        exc = sys.exc_info()[1]
-        sublime.status_message(str(exc))
-        self.highlight_error(str(exc))
+    def show_exception(self, msg):
+        sublime.status_message("[Error]: {}".format(msg))
+        self.highlight_error("{}".format(msg))
 
     def syntax_to_json(self):
         """ Changes syntax to JSON if its in plain text """
@@ -191,8 +182,8 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             try:
                 self.json_loads(self.view.substr(selection))
                 sublime.status_message("JSON is Valid")
-            except Exception:
-                self.show_exception()
+            except Exception as ex:
+                self.show_exception(msg=ex)
                 sublime.message_dialog("Invalid JSON")
 
 
@@ -221,21 +212,28 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 if selected_entire_file:
                     self.syntax_to_json()
 
-            except Exception:
-                amount_of_single_quotes = re.findall(r"(\'[^\']+\'?)", selection_text)
-                amount_of_double_quotes = re.findall(r"(\"[^\"]+\"?)", selection_text)
-
-                if len(amount_of_single_quotes) >= len(amount_of_double_quotes):
-                    selection_text_modified = re.sub(
-                        r"(?:\'([^\']+)\'?)", r'"\1"', selection_text
+            except Exception as ex:
+                try:
+                    amount_of_single_quotes = re.findall(
+                        r"(\'[^\']+\'?)", selection_text
                     )
-                    obj = self.json_loads(selection_text_modified)
-                    self.view.replace(edit, selection, self.json_dumps(obj))
+                    amount_of_double_quotes = re.findall(
+                        r"(\"[^\"]+\"?)", selection_text
+                    )
 
-                    if selected_entire_file:
-                        self.syntax_to_json()
-                else:
-                    self.show_exception()
+                    if len(amount_of_single_quotes) >= len(amount_of_double_quotes):
+                        selection_text_modified = re.sub(
+                            r"(?:\'([^\']+)\'?)", r'"\1"', selection_text
+                        )
+                        obj = self.json_loads(selection_text_modified)
+                        self.view.replace(edit, selection, self.json_dumps(obj))
+
+                        if selected_entire_file:
+                            self.syntax_to_json()
+                    else:
+                        self.show_exception(msg=ex)
+                except Exception as ex:
+                    self.show_exception(msg=ex)
 
 
 class PrettyJsonAndSortCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
@@ -272,8 +270,8 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 if selected_entire_file:
                     self.syntax_to_xml()
 
-            except Exception:
-                self.show_exception()
+            except Exception as ex:
+                self.show_exception(msg=ex)
 
 
 class JqPrettyJson(sublime_plugin.WindowCommand):
@@ -295,7 +293,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
     def get_content(self):
         """ returns content of active view or selected region """
         view = self.window.active_view()
-        selection = ""
+        selection = str()
         for region in view.sel():
             # If no selection, use the entire file as the selection
             if region.empty():
@@ -384,8 +382,8 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 if selected_entire_file:
                     self.syntax_to_xml()
 
-            except Exception:
-                self.show_exception()
+            except Exception as ex:
+                self.show_exception(msg=ex)
 
     def indent_for_26(self, elem, level=0):
         """ intent of ElementTree in case it's py26 without minidom/pyexpat """
@@ -440,8 +438,8 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
             json_data = self.json_loads(content)
             self.generate_items(json_data, "")
             sublime.active_window().show_quick_panel(self.items, self.goto)
-        except Exception:
-            self.show_exception()
+        except Exception as ex:
+            self.show_exception(msg=ex)
 
     def generate_items(self, json_data, root_key):
         if isinstance(json_data, OrderedDict):
@@ -452,7 +450,7 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
                 self.generate_items(json_data[key], new_key_name)
         elif isinstance(json_data, list):
             for index, item in enumerate(json_data):
-                if isinstance(item, basestring):
+                if isinstance(item, str):
                     self.items.append("%s" % root_key + "." + item)
                     self.goto_items.append('"%s"' % item)
 

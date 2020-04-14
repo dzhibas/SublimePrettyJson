@@ -2,3 +2,4 @@
 *.cache
 *.sublime-project
 .idea
+.DS_Store

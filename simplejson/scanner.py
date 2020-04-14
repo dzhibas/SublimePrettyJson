@@ -1,19 +1,21 @@
 """JSON token scanner
 """
 import re
+from .errors import JSONDecodeError
 def _import_c_make_scanner():
     try:
-        from simplejson._speedups import make_scanner
+        from ._speedups import make_scanner
         return make_scanner
     except ImportError:
         return None
 c_make_scanner = _import_c_make_scanner()
 
-__all__ = ['make_scanner']
+__all__ = ['make_scanner', 'JSONDecodeError']
 
 NUMBER_RE = re.compile(
     r'(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?',
     (re.VERBOSE | re.MULTILINE | re.DOTALL))
+
 
 def py_make_scanner(context):
     parse_object = context.parse_object
@@ -30,10 +32,11 @@ def py_make_scanner(context):
     memo = context.memo
 
     def _scan_once(string, idx):
+        errmsg = 'Expecting value'
         try:
             nextchar = string[idx]
         except IndexError:
-            raise StopIteration
+            raise JSONDecodeError(errmsg, string, idx)
 
         if nextchar == '"':
             return parse_string(string, idx + 1, encoding, strict)
@@ -64,9 +67,14 @@ def py_make_scanner(context):
         elif nextchar == '-' and string[idx:idx + 9] == '-Infinity':
             return parse_constant('-Infinity'), idx + 9
         else:
-            raise StopIteration
+            raise JSONDecodeError(errmsg, string, idx)
 
     def scan_once(string, idx):
+        if idx < 0:
+            # Ensure the same behavior as the C speedup, otherwise
+            # this would work for *some* negative string indices due
+            # to the behavior of __getitem__ for strings. #98
+            raise JSONDecodeError('Expecting value', string, idx)
         try:
             return _scan_once(string, idx)
         finally:

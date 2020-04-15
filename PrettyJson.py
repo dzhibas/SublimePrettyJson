@@ -2,14 +2,15 @@ import decimal
 import os
 import re
 import subprocess
+import shutil
 import sys
 from xml.etree import ElementTree
 
 import sublime
 import sublime_plugin
 
-from .libs import simplejson as json
-from .libs.simplejson import OrderedDict
+from .lib import simplejson as json
+from .lib.simplejson import OrderedDict
 
 SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
 
@@ -20,34 +21,20 @@ json_syntax = 'Packages/JSON/JSON.tmLanguage'
 
 jq_exists = False
 jq_init = False
-
-''' for OSX we need to manually add brew bin path so jq can be found '''
-if sys.platform != 'win32' and '/usr/local/bin' not in os.environ['PATH']:
-    os.environ['PATH'] += os.pathsep + '/usr/local/bin'
-
-''' defer jq presence check until the user tries to use it, include Package "Fix Mac Path" to resolve
-    all homebrew issues (https://github.com/int3h/SublimeFixMacPath) '''
+jq_path = str()
 
 
 def check_jq():
-    global jq_exists
-    global jq_init
+    global jq_init, jq_exists, jq_path
 
     if not jq_init:
         jq_init = True
+        jq_test = s.get('jq_binary', 'jq')
         try:
-            # checking if ./jq tool is available so we can use it
-            s = subprocess.Popen(
-                ['jq', '--version'],
-                stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-            )
-            out, err = s.communicate()
+            jq_path = shutil.which(jq_test)
             jq_exists = True
-        except OSError:
-            os_exception = sys.exc_info()[1]
-            print(str(os_exception))
+        except OSError as ex:
+            print(str(ex))
             jq_exists = False
 
 
@@ -58,14 +45,13 @@ class PrettyJsonBaseCommand:
     force_sorting = False
 
     @staticmethod
-    def json_loads(selection):
+    def json_loads(selection: str) -> dict:
         return json.loads(
             selection, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal
         )
 
     @staticmethod
-    def json_dumps(obj, minified=False):
-
+    def json_dumps(obj, minified: bool = False) -> str:
         sort_keys = s.get('sort_keys', False)
         if PrettyJsonBaseCommand.force_sorting:
             sort_keys = True
@@ -102,7 +88,7 @@ class PrettyJsonBaseCommand:
 
         return output_json
 
-    def reindent(self, text, selection):
+    def reindent(self, text: str, selection: str):
         current_line = self.view.line(selection.begin())
         text_before_sel = sublime.Region(current_line.begin(), selection.begin())
 
@@ -122,14 +108,14 @@ class PrettyJsonBaseCommand:
 
         return '\n'.join(lines)
 
-    def show_exception(self, region, msg):
-        sublime.status_message('[Error]: {}'.format(msg))
+    def show_exception(self, region: sublime.Region, msg):
+        sublime.status_message(f'[Error]: {msg}')
         if region is None:
             sublime.message_dialog(msg)
             return
-        self.highlight_error(region=region, message='{}'.format(msg))
+        self.highlight_error(region=region, message=f'{msg}')
 
-    def highlight_error(self, region, message):
+    def highlight_error(self, region: sublime.Region, message: str):
         self.phantom_set = sublime.PhantomSet(self.view, 'json_errors')
 
         char_match = self.json_char_matcher.search(message)
@@ -155,21 +141,19 @@ class PrettyJsonBaseCommand:
     # Description: Taken from https://github.com/sublimelsp/LSP/blob/master/plugin/diagnostics.py
     # - Thanks to the LSP Team
     def create_phantom_html(self, content: str, severity: str) -> str:
-        stylesheet = sublime.load_resource('Packages/SublimePrettyJson/phantom.css')
-        return '''<body id=inline-error>
-                    <style>{}</style>
-                    <div class="{}-arrow"></div>
-                    <div class="{} container">
+        stylesheet = sublime.load_resource('Packages/Pretty JSON/phantom.css')
+        return f'''<body id=inline-error>
+                    <style>{stylesheet}</style>
+                    <div class="{severity}-arrow"></div>
+                    <div class="{severity} container">
                         <div class="toolbar">
                             <a href="hide">×</a>
                         </div>
-                        <div class="content">{}</div>
+                        <div class="content">{content}</div>
                     </div>
-                </body>'''.format(
-            stylesheet, severity, severity, content
-        )
+                </body>'''
 
-    def navigation(self, href):
+    def navigation(self, href: str):
         self.clear_phantoms()
 
     def clear_phantoms(self):
@@ -180,7 +164,7 @@ class PrettyJsonBaseCommand:
         self.phantom_set.update(self.phantoms)
 
     def syntax_to_json(self):
-        ' Changes syntax to JSON if its in plain text '
+        ''' Changes syntax to JSON if its in plain text '''
         if 'Plain text' in self.view.settings().get('syntax'):
             self.view.set_syntax_file(json_syntax)
 
@@ -335,10 +319,10 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
                 selection = region
         return view.substr(selection)
 
-    def done(self, query):
+    def done(self, query: str):
         try:
             p = subprocess.Popen(
-                ["jq", query],
+                [jq_path, query],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,
@@ -424,7 +408,7 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
 
 class JqPrettyJsonOut(sublime_plugin.TextCommand):
-    def run(self, edit, jq_output=str()):
+    def run(self, edit, jq_output: str = str()):
         self.view.insert(edit, 0, jq_output)
 
 

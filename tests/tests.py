@@ -2,7 +2,7 @@ import sys
 import os
 
 # parent folder holds libraries which needs to be included
-sys.path.append(os.path.realpath('..'))
+sys.path.append(os.path.realpath('../lib'))
 
 import simplejson as json
 from simplejson import OrderedDict

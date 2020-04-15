@@ -9,5 +9,9 @@
     "max_arrays_line_length": 120,
     "pretty_on_save": false,
     "validate_on_save": true,
-    "reindent_block": false
+    "reindent_block": false,
+    // Name or Path to jq binary
+    // Example: /usr/bin/local/jq
+    // Example: jq
+    "jq_binary": "jq"
 }

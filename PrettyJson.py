@@ -153,6 +153,10 @@ class PrettyJsonBaseCommand:
         self.highlight_error(region=region, message="{}".format(msg))
 
     def highlight_error(self, region, message):
+        # TODO: Reimplement
+        # - Move this into a global handler
+        # - so that we can generate multiple phantoms
+        # - across multi selections
         self.phantom_set = sublime.PhantomSet(self.view, "json_errors")
         self.phantoms = list()
 

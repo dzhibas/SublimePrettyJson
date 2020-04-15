@@ -52,7 +52,8 @@ def check_jq():
 
 
 class PrettyJsonBaseCommand:
-    json_error_matcher = re.compile(r"line (\d+)")
+    phantom_set = sublime.PhantomSet
+    phantoms = list()
     json_char_matcher = re.compile(r"char (\d+)")
     force_sorting = False
 
@@ -158,40 +159,15 @@ class PrettyJsonBaseCommand:
         # - so that we can generate multiple phantoms
         # - across multi selections
         self.phantom_set = sublime.PhantomSet(self.view, "json_errors")
-        self.phantoms = list()
 
-        matches = self.json_error_matcher.search(message)
         char_match = self.json_char_matcher.search(message)
         if char_match:
             if region.a > region.b:
-                region.b += int(char_match.group(1)) + 1
+                region.b += int(char_match.group(1))
                 region.a = region.b + 1
             else:
-                region.a += int(char_match.group(1)) + 1
+                region.a += int(char_match.group(1))
                 region.b = region.a + 1
-        if matches:
-            line = int(matches.group(1)) - 1
-
-            # sometime we need to highlight one line above
-            if "','" in message and "delimiter" in message:
-                line_content = self.view.substr(
-                    self.view.full_line(self.view.text_point(line - 1, 0))
-                )
-                if (
-                    line_content.strip()
-                    and line_content.strip()[-1] != ","
-                    and line_content.strip() != "{"
-                    and line_content.strip() != "}"
-                ):
-                    line -= 1
-
-            if "control character '\\n'" in message:
-                line_content = self.view.substr(
-                    self.view.full_line(self.view.text_point(line - 1, 0))
-                )
-                quotes = re.findall(r"\"", line_content)
-                if len(quotes) % 2 != 0 and len(quotes) != 0:
-                    line -= 1
 
             self.phantoms.append(
                 sublime.Phantom(
@@ -222,6 +198,8 @@ class PrettyJsonBaseCommand:
         )
 
     def navigation(self, href):
+        if isinstance(self.phantom_set, type):
+            self.phantom_set = sublime.PhantomSet(self.view, "json_errors")
         if href == "hide":
             self.phantoms = list()
             self.phantom_set.update(self.phantoms)
@@ -234,7 +212,7 @@ class PrettyJsonBaseCommand:
 
 class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.erase_regions("json_errors")
+        PrettyJsonBaseCommand.navigation(self, "hide")
         regions = self.view.sel()
         for region in regions:
             if region.empty() and len(regions) > 1:
@@ -258,7 +236,8 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     """
 
     def run(self, edit):
-        self.view.erase_regions("json_errors")
+        PrettyJsonBaseCommand.phantoms = list()
+        PrettyJsonBaseCommand.phantom_set.update(PrettyJsonBaseCommand.phantoms)
         regions = self.view.sel()
         for region in regions:
             selected_entire_file = False
@@ -330,7 +309,7 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     """
 
     def run(self, edit):
-        self.view.erase_regions("json_errors")
+        PrettyJsonBaseCommand.navigation(self, "hide")
         for region in self.view.sel():
             selected_entire_file = False
 

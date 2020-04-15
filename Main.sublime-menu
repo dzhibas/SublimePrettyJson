@@ -1,12 +1,8 @@
 [
 {
-    "mnemonic": "n",
-    "caption": "Preferences",
     "id": "preferences",
     "children": [
     {
-        "mnemonic": "P",
-        "caption": "Package Settings",
         "id": "package-settings",
         "children": [
         {

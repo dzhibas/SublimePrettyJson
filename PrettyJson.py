@@ -186,7 +186,7 @@ class PrettyJsonBaseCommand:
         stylesheet = sublime.load_resource("Packages/SublimePrettyJson/phantom.css")
         return """<body id=inline-error>
                     <style>{}</style>
-                    <div class="{}"></div>
+                    <div class="{}-arrow"></div>
                     <div class="{} container">
                         <div class="toolbar">
                             <a href="hide">×</a>
@@ -472,14 +472,14 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
         if isinstance(json_data, OrderedDict):
             for key in json_data:
                 new_key_name = root_key + "." + key
-                self.items.append("%s" % new_key_name)
-                self.goto_items.append('"%s"' % key)
+                self.items.append("{}".format(new_key_name))
+                self.goto_items.append('"{}"'.format(key))
                 self.generate_items(json_data[key], new_key_name)
         elif isinstance(json_data, list):
             for index, item in enumerate(json_data):
                 if isinstance(item, str):
-                    self.items.append("%s" % root_key + "." + item)
-                    self.goto_items.append('"%s"' % item)
+                    self.items.append("{}.{}".format(root_key, item))
+                    self.goto_items.append('"{}"'.format(item))
 
     def goto(self, pos):
         string_to_search = self.goto_items[pos]

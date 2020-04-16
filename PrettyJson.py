@@ -143,16 +143,16 @@ class PrettyJsonBaseCommand:
                 region.a += int(char_match.group(1))
                 region.b = region.a + 1
 
-            self.phantoms.append(
-                sublime.Phantom(
-                    region,
-                    self.create_phantom_html(message, 'error'),
-                    sublime.LAYOUT_BELOW,
-                    self.navigation,
-                )
+        self.phantoms.append(
+            sublime.Phantom(
+                region,
+                self.create_phantom_html(message, 'error'),
+                sublime.LAYOUT_BELOW,
+                self.navigation,
             )
-            self.phantom_set.update(self.phantoms)
-            self.view.set_status('json_errors', message)
+        )
+        self.phantom_set.update(self.phantoms)
+        self.view.set_status('json_errors', message)
 
     # Description: Taken from 
     # - https://github.com/sublimelsp/LSP/blob/master/plugin/diagnostics.py
@@ -199,9 +199,27 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
             try:
                 self.json_loads(self.view.substr(selection))
-                sublime.status_message('JSON is Valid')
             except Exception as ex:
                 self.show_exception(region=region, msg=ex)
+                return
+
+            try:
+                decoder = json.JSONDecoder(object_pairs_hook=self.duplicate_key_hook)
+                decoder.decode(self.view.substr(selection))
+            except Exception as ex:
+                self.show_exception(region=region, msg=ex)
+                return
+
+            sublime.status_message("JSON Valid")
+
+    def duplicate_key_hook(self, pairs):
+        result = dict()
+        for key, val in pairs:
+            if key in result:
+                raise KeyError(f"Duplicate key specified: {key}")
+            result[key] = val
+        return result
+
 
 
 class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):

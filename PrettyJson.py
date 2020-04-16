@@ -19,23 +19,25 @@ s = sublime.load_settings('Pretty JSON.sublime-settings')
 xml_syntax = 'Packages/XML/XML.tmLanguage'
 json_syntax = 'Packages/JSON/JSON.tmLanguage'
 
-jq_exists = False
-jq_init = False
+jq_exists = bool()
+jq_init = bool()
 jq_path = str()
 
 
 def check_jq():
     global jq_init, jq_exists, jq_path
 
-    if not jq_init:
-        jq_init = True
-        jq_test = s.get('jq_binary', 'jq')
-        try:
-            jq_path = shutil.which(jq_test)
-            jq_exists = True
-        except OSError as ex:
-            print(str(ex))
-            jq_exists = False
+    if jq_init:
+        return
+
+    jq_init = True
+    jq_test = s.get('jq_binary', 'jq')
+    try:
+        jq_path = shutil.which(jq_test)
+        jq_exists = True
+    except OSError as ex:
+        print(str(ex))
+        jq_exists = False
 
 
 class PrettyJsonBaseCommand:
@@ -103,15 +105,15 @@ class PrettyJsonBaseCommand:
 
         i = 1
         while i < len(lines):
-            lines[i] = indent_space + lines[i]
+            lines[i] = f'{indent_space}{lines[i]}'
             i += 1
 
         return '\n'.join(lines)
 
-    def show_exception(self, region: sublime.Region, msg):
+    def show_exception(self, region: sublime.Region = None, msg=str()):
         sublime.status_message(f'[Error]: {msg}')
         if region is None:
-            sublime.message_dialog(msg)
+            sublime.message_dialog(f'[Error]: {msg}')
             return
         self.highlight_error(region=region, message=f'{msg}')
 
@@ -138,7 +140,8 @@ class PrettyJsonBaseCommand:
             self.phantom_set.update(self.phantoms)
             self.view.set_status('json_errors', message)
 
-    # Description: Taken from https://github.com/sublimelsp/LSP/blob/master/plugin/diagnostics.py
+    # Description: Taken from 
+    # - https://github.com/sublimelsp/LSP/blob/master/plugin/diagnostics.py
     # - Thanks to the LSP Team
     def create_phantom_html(self, content: str, severity: str) -> str:
         stylesheet = sublime.load_resource('Packages/Pretty JSON/phantom.css')
@@ -164,9 +167,7 @@ class PrettyJsonBaseCommand:
         self.phantom_set.update(self.phantoms)
 
     def syntax_to_json(self):
-        ''' Changes syntax to JSON if its in plain text '''
-        if 'Plain text' in self.view.settings().get('syntax'):
-            self.view.set_syntax_file(json_syntax)
+        self.view.set_syntax_file(json_syntax)
 
 
 class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
@@ -267,11 +268,12 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
     def run(self, edit):
         PrettyJsonBaseCommand.clear_phantoms(self)
-        for region in self.view.sel():
+        regions = self.view.sel()
+        for region in regions:
             selected_entire_file = False
-
-            # If no selection, use the entire file as the selection
-            if region.empty() and s.get("use_entire_file_if_no_selection", True):
+            if region.empty() and len(regions) > 1:
+                continue
+            elif region.empty() and s.get('use_entire_file_if_no_selection', True):
                 selection = sublime.Region(0, self.view.size())
                 region = sublime.Region(0, self.view.size())
                 selected_entire_file = True
@@ -311,9 +313,11 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
         ''' returns content of active view or selected region '''
         view = self.window.active_view()
         selection = str()
-        for region in view.sel():
-            # If no selection, use the entire file as the selection
-            if region.empty():
+        regions = view.sel()
+        for region in regions:
+            if region.empty() and len(regions) > 1:
+                continue
+            elif region.empty():
                 selection = sublime.Region(0, view.size())
             else:
                 selection = region
@@ -348,12 +352,14 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.view.erase_regions('json_errors')
-        for region in self.view.sel():
+        regions = self.view.sel()
+        for region in regions:
             selected_entire_file = False
-
-            # If no selection, use the entire file as the selection
-            if region.empty() and s.get('use_entire_file_if_no_selection', True):
+            if region.empty() and len(regions) > 1:
+                continue
+            elif region.empty() and s.get('use_entire_file_if_no_selection', True):
                 selection = sublime.Region(0, self.view.size())
+                region = sublime.Region(0, self.view.size())
                 selected_entire_file = True
             else:
                 selection = region
@@ -366,12 +372,10 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 xml_string = '<?xml version=\'1.0\' encoding=\'UTF-8\' ?>\n'
 
                 rtn = ElementTree.tostring(root, 'utf-8')
-
                 if type(rtn) is bytes:
                     rtn = rtn.decode('utf-8')
 
                 xml_string += rtn
-
                 if type(xml_string) is bytes:
                     xml_string = xml_string.decode('utf-8')
 
@@ -403,7 +407,6 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
         return element
 
     def syntax_to_xml(self):
-        ''' change syntax to xml '''
         self.view.set_syntax_file(xml_syntax)
 
 

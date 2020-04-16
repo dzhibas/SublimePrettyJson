@@ -1,3 +1,6 @@
+/* Description: Taken from LSP
+- https://github.com/sublimelsp/LSP/blob/master/plugin/diagnostics.py
+*/
 div.error-arrow {
     border-top: 0.4rem solid transparent;
     border-left: 0.5rem solid color(var(--redish) blend(var(--background) 30%));

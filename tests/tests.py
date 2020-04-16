@@ -29,9 +29,9 @@ class TestIssues(unittest.TestCase):
     # issue 15
     def test_float_issue_15(self):
         tmp_str = '{"real":0.99}'
-        expected_output = """{
+        expected_output = '''{
   "real": 0.99
-}"""
+}'''
         obj = json.loads(tmp_str, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal)
         tmp_str = json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=False,
                              separators=(',', ': '),
@@ -52,7 +52,7 @@ class TestIssues(unittest.TestCase):
     def test_float_issue_16_2(self):
         tmp_str = '{"test1":0.99, "test2":"1.99", "test3":1.00000000001, "test4":1.99, "test5":1,' \
                   ' "test6":4.589999999999999999, "test7":1.0}'
-        expected_output = """{
+        expected_output = '''{
   "test1": 0.99,
   "test2": "1.99",
   "test3": 1.00000000001,
@@ -60,7 +60,7 @@ class TestIssues(unittest.TestCase):
   "test5": 1,
   "test6": 4.589999999999999999,
   "test7": 1.0
-}"""
+}'''
         obj = json.loads(tmp_str, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal)
         tmp_str = json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=False,
                              separators=(',', ': '),
@@ -68,9 +68,9 @@ class TestIssues(unittest.TestCase):
         self.assertEqual(tmp_str, expected_output)
 
     def test_compress_feature(self):
-        tmp_str = """{
+        tmp_str = '''{
   "real": 0.99
-}"""
+}'''
         expected_output = '{"real":0.99}'
         obj = json.loads(tmp_str, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal)
         tmp_str = json.dumps(obj, ensure_ascii=False, sort_keys=False,

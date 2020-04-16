@@ -43,8 +43,10 @@ def check_jq():
 class PrettyJsonBaseCommand:
     phantom_set = sublime.PhantomSet
     phantoms = list()
-    json_char_matcher = re.compile(r'char (\d+)')
     force_sorting = False
+    json_char_matcher = re.compile(r'char (\d+)')
+    brace_newline = re.compile(r'^((\s*)".*?":)\s*([{])', re.MULTILINE)
+    bracket_newline = re.compile(r'^((\s*)".*?":)\s*([\[])', re.MULTILINE)
 
     @staticmethod
     def json_loads(selection: str) -> dict:
@@ -87,19 +89,31 @@ class PrettyJsonBaseCommand:
                 replacement = '[' + join_separator.join(items) + ']'
                 if len(replacement) <= s.get('max_arrays_line_length', 120):
                     output_json = output_json.replace(m, replacement, 1)
+        if s.get("brace_newline", True):
+            output_json = PrettyJsonBaseCommand.brace_newline.sub(r'\1\n\2\3', output_json)
+
+        if (
+            s.get("bracket_newline", True)
+            and s.get('keep_arrays_single_line', False) is False
+            ):
+            output_json = PrettyJsonBaseCommand.bracket_newline.sub(r'\1\n\2\3', output_json)
 
         return output_json
+
+    def brace_bracket_newline(json_data: str) -> str:
+        better_json =  PrettyJsonBaseCommand.brace_bracket_newline.sub(r'\1\n\2\3', json_data)
+        return better_json
 
     def reindent(self, text: str, selection: str):
         current_line = self.view.line(selection.begin())
         text_before_sel = sublime.Region(current_line.begin(), selection.begin())
 
-        reindent_mode = s.get('reindent_block', 'minimal')
+        reindent_mode = s.get('reindent_block', False)
         if reindent_mode == 'start':
             space_number = text_before_sel.size()
             indent_space = ' ' * space_number
-        else:
-            indent_space = re.search('^\s*', self.view.substr(text_before_sel)).group(0)
+        elif reindent_mode == 'minimal':
+            indent_space = re.search(r'^\s*', self.view.substr(text_before_sel)).group(0)
 
         lines = text.split('\n')
 

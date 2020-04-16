@@ -327,7 +327,7 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
 class JqPrettyJson(sublime_plugin.WindowCommand):
     '''
-    Description: Allows work with ./jq
+    Description: ./jq integration
     '''
 
     def run(self):
@@ -365,16 +365,15 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
             )
 
             raw_json = self.get_content()
-            out, err = p.communicate(bytes(raw_json, "utf-8"))
+            out, err = p.communicate(bytes(raw_json, "UTF-8"))
             output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
             if output:
                 view = self.window.new_file()
                 view.run_command("jq_pretty_json_out", {"jq_output": output})
                 view.set_syntax_file(json_syntax)
 
-        except OSError:
-            exc = sys.exc_info()[1]
-            sublime.status_message(str(exc))
+        except OSError as ex:
+            sublime.status_message(f'{ex}')
 
 
 class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
@@ -455,7 +454,7 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
         content = self.view.substr(sublime.Region(0, self.view.size()))
         try:
             json_data = self.json_loads(content)
-            self.generate_items(json_data, "")
+            self.generate_items(json_data, '')
             sublime.active_window().show_quick_panel(self.items, self.goto)
         except Exception as ex:
             self.show_exception(region=None, msg=ex)

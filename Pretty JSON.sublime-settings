@@ -3,7 +3,7 @@
     "indent": 4,
 
     "sort_keys": false,
-    "ensure_ascii": false,
+    "ensure_ascii": true,
     "line_separator": ",",
     "value_separator": ": ",
     "keep_arrays_single_line": false,

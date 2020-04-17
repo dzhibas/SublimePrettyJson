@@ -327,6 +327,7 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 class JqInsertPrettyJsonCommand(sublime_plugin.TextCommand):
     def run(self, edit, string):
         self.view.replace(edit, sublime.Region(0, self.view.size()), string)
+        # self.view.sel().clear()
 
 
 class JqPrettyJsonCommand(sublime_plugin.TextCommand):
@@ -353,12 +354,14 @@ class JqPrettyJsonCommand(sublime_plugin.TextCommand):
         preview_view = preview_window.new_file()
         preview_view.set_scratch(True)
         preview_view.set_name("Preview")
+        preview_view.sel().clear()
 
         preview_window.focus_group(0)
         jq_view = preview_window.new_file()
         jq_view.run_command("jq_insert_pretty_json", {"string": content})
         jq_view.set_read_only(True)
         jq_view.set_scratch(True)
+        jq_view.sel().clear()
 
         jq_view.set_syntax_file(syntax_file)
         preview_view.set_syntax_file(json_syntax)

@@ -192,10 +192,28 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
             try:
                 self.json_loads(self.view.substr(selection))
-                sublime.message_dialog("JSON is Valid")
             except Exception:
                 self.show_exception()
                 sublime.message_dialog("Invalid JSON")
+                return
+
+            try:
+                decoder = json.JSONDecoder(object_pairs_hook=self.duplicate_key_hook)
+                decoder.decode(self.view.substr(selection))
+            except Exception as ex:
+                self.show_exception()
+                sublime.message_dialog("Invalid JSON")
+                return
+
+            sublime.message_dialog("Invalid JSON")
+
+    def duplicate_key_hook(self, pairs):
+        result = dict()
+        for key, val in pairs:
+            if key in result:
+                raise KeyError("Duplicate key specified: %s" % key)
+            result[key] = val
+        return result
 
 
 class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):

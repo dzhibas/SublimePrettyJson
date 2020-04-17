@@ -90,6 +90,7 @@ class PrettyJsonBaseCommand:
         if post_process:
             # find all array matches
             matches = re.findall(r"(\[[^\[\]]+?\])", output_json)
+            matches.sort(key=len, reverse=True)
             join_separator = line_separator.ljust(2)
             for m in matches:
                 content = m[1:-1]
@@ -97,7 +98,7 @@ class PrettyJsonBaseCommand:
                 replacement = "[" + join_separator.join(items) + "]"
                 # if line not gets too long, replace with single line
                 if len(replacement) <= s.get("max_arrays_line_length", 120):
-                    output_json = output_json.replace(m, replacement)
+                    output_json = output_json.replace(m, replacement, 1)
 
         return output_json
 
@@ -291,7 +292,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
                     out, err = p.communicate(unicode(raw_json).encode('utf-8'))
             else:
                 out, err = p.communicate(bytes(raw_json, "utf-8"))
-            output = out.decode("UTF-8").strip()
+            output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
             if output:
                 view = self.window.new_file()
                 view.run_command("jq_pretty_json_out", {"jq_output": output})

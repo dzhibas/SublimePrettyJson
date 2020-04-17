@@ -90,6 +90,7 @@ class PrettyJsonBaseCommand:
         if post_process:
             # find all array matches
             matches = re.findall(r"\[([^\[\]]+?)\]", output_json)
+            matches.sort(key=len, reverse=True)
             join_separator = line_separator.ljust(2)
             for m in matches:
                 items = [a.strip() for a in m.split(line_separator.strip())]

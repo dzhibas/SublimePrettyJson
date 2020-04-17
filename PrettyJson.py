@@ -89,12 +89,13 @@ class PrettyJsonBaseCommand:
 
         if post_process:
             # find all array matches
-            matches = re.findall(r"\[([^\[\]]+?)\]", output_json)
+            matches = re.findall(r"(\[[^\[\]]+?\])", output_json)
             matches.sort(key=len, reverse=True)
             join_separator = line_separator.ljust(2)
             for m in matches:
-                items = [a.strip() for a in m.split(line_separator.strip())]
-                replacement = join_separator.join(items)
+                content = m[1:-1]
+                items = [a.strip() for a in content.split(line_separator.strip())]
+                replacement = "[" + join_separator.join(items) + "]"
                 # if line not gets too long, replace with single line
                 if len(replacement) <= s.get("max_arrays_line_length", 120):
                     output_json = output_json.replace(m, replacement, 1)

@@ -7,7 +7,7 @@
     },
     {
         "keys": ["ctrl+alt+shift+j"],
-        "command": "jq_pretty_json"
+        "command": "jq_query_pretty_json"
     },
     {
         "keys": ["ctrl+r"],

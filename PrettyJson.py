@@ -27,7 +27,7 @@ SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
 
 jq_exits = False
 jq_init = False
-
+jq_path = str()
 
 """ for OSX we need to manually add brew bin path so jq can be found """
 if sys.platform != "win32" and "/usr/local/bin" not in os.environ["PATH"]:
@@ -38,20 +38,20 @@ if sys.platform != "win32" and "/usr/local/bin" not in os.environ["PATH"]:
 
 
 def check_jq():
-    global jq_exits
-    global jq_init
+    global jq_exits, jq_init, jq_path
 
     if not jq_init:
         jq_init = True
+        jq_path = s.get("jq_binary", "jq")
         try:
             # checking if ./jq tool is available so we can use it
-            s = subprocess.Popen(
-                ["jq", "--version"],
+            jq = subprocess.Popen(
+                [jq_path, "--version"],
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE,
             )
-            out, err = s.communicate()
+            out, err = jq.communicate()
             jq_exits = True
         except OSError:
             os_exception = sys.exc_info()[1]
@@ -334,7 +334,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
     def done(self, query):
         try:
             p = subprocess.Popen(
-                ["jq", query],
+                [jq_path, query],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,

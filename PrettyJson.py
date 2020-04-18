@@ -205,7 +205,7 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 sublime.message_dialog("Invalid JSON")
                 return
 
-            sublime.message_dialog("Invalid JSON")
+            sublime.message_dialog("Valid JSON")
 
     def duplicate_key_hook(self, pairs):
         result = dict()

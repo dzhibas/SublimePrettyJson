@@ -8,6 +8,10 @@
         "command": "pretty_json_and_sort"
     },
     {
+        "caption": "Pretty JSON: Format JSON Lines",
+        "command": "pretty_json_lines"
+    },
+    {
         "caption": "Pretty JSON: Minify (compress) JSON",
         "command": "un_pretty_json"
     },

@@ -24,6 +24,7 @@ except ValueError:
     from simplejson import OrderedDict
 
 SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
+s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 jq_exits = False
 jq_init = False
@@ -57,9 +58,6 @@ def check_jq():
             os_exception = sys.exc_info()[1]
             print(str(os_exception))
             jq_exits = False
-
-
-s = sublime.load_settings("Pretty JSON.sublime-settings")
 
 
 class PrettyJsonBaseCommand:
@@ -200,7 +198,7 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             try:
                 decoder = json.JSONDecoder(object_pairs_hook=self.duplicate_key_hook)
                 decoder.decode(self.view.substr(selection))
-            except Exception as ex:
+            except Exception:
                 self.show_exception()
                 sublime.message_dialog("Invalid JSON")
                 return
@@ -273,6 +271,61 @@ class PrettyJsonAndSortCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
         PrettyJsonBaseCommand.force_sorting = True
         PrettyJsonCommand.run(self, edit)
         PrettyJsonBaseCommand.force_sorting = False
+
+
+class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
+
+    """ 
+    Description: Pretty print json lines https://jsonlines.org
+     """
+
+    def run(self, edit):
+        self.view.erase_regions("json_errors")
+        regions = self.view.sel()
+        for region in regions:
+            selected_entire_file = False
+            if region.empty() and len(regions) > 1:
+                continue
+            elif region.empty() and s.get("use_entire_file_if_no_selection", True):
+                selection = sublime.Region(0, self.view.size())
+                selected_entire_file = True
+            else:
+                selection = region
+
+            for jsonl in sorted(self.view.split_by_newlines(selection), reverse=True):
+                if jsonl.empty() and len(jsonl) > 1:
+                    continue
+
+                try:
+                    selection_text = self.view.substr(jsonl)
+                    obj = self.json_loads(selection_text)
+                    self.view.replace(edit, jsonl, self.json_dumps(obj))
+
+                    if selected_entire_file:
+                        self.change_syntax()
+
+                except Exception:
+                    try:
+                        amount_of_single_quotes = re.findall(
+                            r"(\'[^\']+\'?)", selection_text
+                        )
+                        amount_of_double_quotes = re.findall(
+                            r"(\"[^\"]+\"?)", selection_text
+                        )
+
+                        if len(amount_of_single_quotes) >= len(amount_of_double_quotes):
+                            selection_text_modified = re.sub(
+                                r"(?:\'([^\']+)\'?)", r'"\1"', selection_text
+                            )
+                            obj = self.json_loads(selection_text_modified)
+                            self.view.replace(edit, jsonl, self.json_dumps(obj))
+
+                            if selected_entire_file:
+                                self.change_syntax()
+                        else:
+                            self.show_exception()
+                    except:
+                        self.show_exception()
 
 
 class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):

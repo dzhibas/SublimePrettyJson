@@ -19,5 +19,11 @@
     // Example: /usr/bin/local/jq
     // Example: jq
     "jq_binary": "jq",
-    "jq_errors": false
+    "jq_errors": false,
+    "as_json":[
+     "JSON",
+     "Sublime Text Commands",
+     "Sublime Text Settingss",
+     "Sublime Text Menu"
+ ]
 }

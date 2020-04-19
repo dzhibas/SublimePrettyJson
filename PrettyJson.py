@@ -11,7 +11,7 @@ import sublime_plugin
 from .lib import simplejson as json
 from .lib.simplejson import OrderedDict
 
-SUBLIME_MAJOR_VERSION = int(sublime.version()) / 1000
+
 PREVIOUS_CONTENT = [str(), str()]
 PREVIOUS_QUERY_LEN = int()
 
@@ -95,13 +95,8 @@ class PrettyJsonBaseCommand:
         if s.get("brace_newline", True):
             output_json = PrettyJsonBaseCommand.brace_newline.sub(r'\1\n\2\3', output_json)
 
-        
-
         return output_json
 
-    def brace_bracket_newline(json_data: str) -> str:
-        better_json =  PrettyJsonBaseCommand.brace_bracket_newline.sub(r'\1\n\2\3', json_data)
-        return better_json
 
     def reindent(self, text: str, selection: str):
         current_line = self.view.line(selection.begin())
@@ -221,7 +216,6 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
         return result
 
 
-
 class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     '''
     Description: Pretty Print JSON
@@ -328,7 +322,6 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 class JqInsertPrettyJsonCommand(sublime_plugin.TextCommand):
     def run(self, edit, string):
         self.view.replace(edit, sublime.Region(0, self.view.size()), string)
-        # self.view.sel().clear()
 
 
 class JqPrettyJsonCommand(sublime_plugin.TextCommand):

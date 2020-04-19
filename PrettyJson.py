@@ -126,6 +126,20 @@ class PrettyJsonBaseCommand:
             use_decimal=True,
         )
 
+    @staticmethod
+    def get_selection_from_region(
+        region: sublime.Region, regions_length: int, view: sublime.View
+    ) -> sublime.Region:
+        selected_entire_file = False
+        if region.empty() and regions_length > 1:
+            return None, None
+        elif region.empty() and s.get("use_entire_file_if_no_selection", True):
+            selection = sublime.Region(0, view.size())
+            selected_entire_file = True
+        else:
+            selection = region
+        return selection, selected_entire_file
+
     def highlight_error(self, message):
 
         self.view.erase_regions("json_errors")
@@ -181,12 +195,14 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
         self.view.erase_regions("json_errors")
         regions = self.view.sel()
         for region in regions:
-            if region.empty() and len(regions) > 1:
+            (
+                selection,
+                selected_entire_file,
+            ) = PrettyJsonBaseCommand.get_selection_from_region(
+                region=region, regions_length=len(regions), view=self.view
+            )
+            if selection is None:
                 continue
-            elif region.empty() and s.get("use_entire_file_if_no_selection", True):
-                selection = sublime.Region(0, self.view.size())
-            else:
-                selection = region
 
             try:
                 self.json_loads(self.view.substr(selection))
@@ -222,14 +238,14 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
         self.view.erase_regions("json_errors")
         regions = self.view.sel()
         for region in regions:
-            selected_entire_file = False
-            if region.empty() and len(regions) > 1:
+            (
+                selection,
+                selected_entire_file,
+            ) = PrettyJsonBaseCommand.get_selection_from_region(
+                region=region, regions_length=len(regions), view=self.view
+            )
+            if selection is None:
                 continue
-            elif region.empty() and s.get("use_entire_file_if_no_selection", True):
-                selection = sublime.Region(0, self.view.size())
-                selected_entire_file = True
-            else:
-                selection = region
 
             try:
                 selection_text = self.view.substr(selection)
@@ -283,14 +299,14 @@ class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
         self.view.erase_regions("json_errors")
         regions = self.view.sel()
         for region in regions:
-            selected_entire_file = False
-            if region.empty() and len(regions) > 1:
+            (
+                selection,
+                selected_entire_file,
+            ) = PrettyJsonBaseCommand.get_selection_from_region(
+                region=region, regions_length=len(regions), view=self.view
+            )
+            if selection is None:
                 continue
-            elif region.empty() and s.get("use_entire_file_if_no_selection", True):
-                selection = sublime.Region(0, self.view.size())
-                selected_entire_file = True
-            else:
-                selection = region
 
             for jsonl in sorted(self.view.split_by_newlines(selection), reverse=True):
                 if jsonl.empty() and len(jsonl) > 1:
@@ -336,14 +352,14 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
         self.view.erase_regions("json_errors")
         regions = self.view.sel()
         for region in regions:
-            selected_entire_file = False
-            if region.empty() and len(regions) > 1:
+            (
+                selection,
+                selected_entire_file,
+            ) = PrettyJsonBaseCommand.get_selection_from_region(
+                region=region, regions_length=len(regions), view=self.view
+            )
+            if selection is None:
                 continue
-            elif region.empty() and s.get("use_entire_file_if_no_selection", True):
-                selection = sublime.Region(0, self.view.size())
-                selected_entire_file = True
-            else:
-                selection = region
 
             try:
                 obj = self.json_loads(self.view.substr(selection))
@@ -376,12 +392,13 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
         """ returns content of active view or selected region """
         view = self.window.active_view()
         selection = ""
-        for region in view.sel():
-            # If no selection, use the entire file as the selection
-            if region.empty():
-                selection = sublime.Region(0, view.size())
-            else:
-                selection = region
+        regions = view.sel()
+        for region in regions:
+            (selection, _,) = PrettyJsonBaseCommand.get_selection_from_region(
+                region=region, regions_length=len(regions), view=self.view
+            )
+            if selection is None:
+                continue
         return view.substr(selection)
 
     def done(self, query):

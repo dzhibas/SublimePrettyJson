@@ -3,7 +3,7 @@ import os
 import re
 import subprocess
 import shutil
-from xml.etree import ElementTree
+from xml.etree import ElementTree as et
 
 import sublime
 import sublime_plugin
@@ -97,6 +97,18 @@ class PrettyJsonBaseCommand:
 
         return output_json
 
+    @staticmethod
+    def get_selection_from_region(
+        region: sublime.Region, regions_length: int, view: sublime.View
+    ) -> sublime.Region:
+        entire_file = False
+        if region.empty() and regions_length > 1:
+            return None, None
+        elif region.empty() and s.get("use_entire_file_if_no_selection", True):
+            region = sublime.Region(0, view.size())
+            entire_file = True
+
+        return region, entire_file
 
     def reindent(self, text: str, selection: str):
         current_line = self.view.line(selection.begin())
@@ -181,26 +193,25 @@ class PrettyJsonBaseCommand:
 
 class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     def run(self, edit):
-        PrettyJsonBaseCommand.clear_phantoms(self)
+        self.clear_phantoms(self)
         regions = self.view.sel()
         for region in regions:
-            if region.empty() and len(regions) > 1:
+            region, _ = self.get_selection_from_region(
+                region=region,
+                regions_length=len(region),
+                view=self.view)
+            if region is None:
                 continue
-            elif region.empty() and s.get('use_entire_file_if_no_selection', True):
-                selection = sublime.Region(0, self.view.size())
-                region = sublime.Region(0, self.view.size())
-            else:
-                selection = region
 
             try:
-                self.json_loads(self.view.substr(selection))
+                self.json_loads(self.view.substr(region))
             except Exception as ex:
                 self.show_exception(region=region, msg=ex)
                 return
 
             try:
                 decoder = json.JSONDecoder(object_pairs_hook=self.duplicate_key_hook)
-                decoder.decode(self.view.substr(selection))
+                decoder.decode(self.view.substr(region))
             except Exception as ex:
                 self.show_exception(region=region, msg=ex)
                 return
@@ -222,30 +233,27 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        PrettyJsonBaseCommand.clear_phantoms(self)
+        self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
-            selected_entire_file = False
-            if region.empty() and len(regions) > 1:
+            region, entire_file = self.get_selection_from_region(
+                region=region,
+                regions_length=len(region),
+                view=self.view)
+            if region is None:
                 continue
-            elif region.empty() and s.get('use_entire_file_if_no_selection', True):
-                selection = sublime.Region(0, self.view.size())
-                region = sublime.Region(0, self.view.size())
-                selected_entire_file = True
-            else:
-                selection = region
 
             try:
-                selection_text = self.view.substr(selection)
+                selection_text = self.view.substr(region)
                 obj = self.json_loads(selection_text)
 
                 json_text = self.json_dumps(obj=obj, minified=False)
-                if not selected_entire_file and s.get('reindent_block', False):
-                    json_text = self.reindent(json_text, selection)
+                if not entire_file and s.get('reindent_block', False):
+                    json_text = self.reindent(json_text, region)
 
-                self.view.replace(edit, selection, json_text)
+                self.view.replace(edit, region, json_text)
 
-                if selected_entire_file:
+                if entire_file:
                     self.syntax_to_json()
 
             except Exception as ex:
@@ -264,11 +272,11 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                         obj = self.json_loads(selection_text_modified)
                         json_text = self.json_dumps(obj=obj, minified=False)
 
-                        if not selected_entire_file and s.get('reindent_block', False):
-                            json_text = self.reindent(json_text, selection)
+                        if not entire_file and s.get('reindent_block', False):
+                            json_text = self.reindent(json_text, region)
 
-                        self.view.replace(edit, selection, json_text)
-                        if selected_entire_file:
+                        self.view.replace(edit, region, json_text)
+                        if entire_file:
                             self.syntax_to_json()
                     else:
                         self.show_exception(region=region, msg=ex)
@@ -282,9 +290,9 @@ class PrettyJsonAndSortCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        PrettyJsonBaseCommand.force_sorting = True
+        self.force_sorting = True
         PrettyJsonCommand.run(self, edit)
-        PrettyJsonBaseCommand.force_sorting = False
+        self.force_sorting = False
 
 
 class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
@@ -293,26 +301,23 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        PrettyJsonBaseCommand.clear_phantoms(self)
+        self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
-            selected_entire_file = False
-            if region.empty() and len(regions) > 1:
+            region, entire_file = self.get_selection_from_region(
+                region=region,
+                regions_length=len(region),
+                view=self.view)
+            if region is None:
                 continue
-            elif region.empty() and s.get('use_entire_file_if_no_selection', True):
-                selection = sublime.Region(0, self.view.size())
-                region = sublime.Region(0, self.view.size())
-                selected_entire_file = True
-            else:
-                selection = region
 
             try:
-                obj = self.json_loads(self.view.substr(selection))
+                obj = self.json_loads(self.view.substr(region))
                 self.view.replace(
-                    edit, selection, self.json_dumps(obj=obj, minified=True)
+                    edit, region, self.json_dumps(obj=obj, minified=True)
                 )
 
-                if selected_entire_file:
+                if entire_file:
                     self.syntax_to_json()
 
             except Exception as ex:
@@ -443,27 +448,24 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        self.view.erase_regions('json_errors')
+        self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
-            selected_entire_file = False
-            if region.empty() and len(regions) > 1:
+            region, entire_file = self.get_selection_from_region(
+                region=region,
+                regions_length=len(region),
+                view=self.view)
+            if region is None:
                 continue
-            elif region.empty() and s.get('use_entire_file_if_no_selection', True):
-                selection = sublime.Region(0, self.view.size())
-                region = sublime.Region(0, self.view.size())
-                selected_entire_file = True
-            else:
-                selection = region
 
             try:
-                h = json.loads(self.view.substr(selection))
-                root = ElementTree.Element('root')
+                h = json.loads(self.view.substr(region))
+                root = et.Element('root')
                 root = self.traverse(root, h)
 
                 xml_string = '<?xml version=\'1.0\' encoding=\'UTF-8\' ?>\n'
 
-                rtn = ElementTree.tostring(root, 'utf-8')
+                rtn = et.tostring(root, 'utf-8')
                 if type(rtn) is bytes:
                     rtn = rtn.decode('utf-8')
 
@@ -471,12 +473,12 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 if type(xml_string) is bytes:
                     xml_string = xml_string.decode('utf-8')
 
-                if not selected_entire_file and s.get('reindent_block', False):
-                    xml_string = self.reindent(xml_string, selection)
+                if not entire_file and s.get('reindent_block', False):
+                    xml_string = self.reindent(xml_string, region)
 
-                self.view.replace(edit, selection, xml_string)
+                self.view.replace(edit, region, xml_string)
 
-                if selected_entire_file:
+                if entire_file:
                     self.syntax_to_xml()
 
             except Exception as ex:
@@ -486,12 +488,12 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
         ''' recursive traverse through dict and build xml tree '''
         if type(json_dict) is dict and json_dict.keys():
             for i in json_dict.keys():
-                e = ElementTree.Element(i)
+                e = et.Element(i)
                 element.append(self.traverse(e, json_dict[i]))
         elif type(json_dict) is list:
-            e_items = ElementTree.Element('items')
+            e_items = et.Element('items')
             for i in json_dict:
-                e_items.append(self.traverse(ElementTree.Element('item'), i))
+                e_items.append(self.traverse(et.Element('item'), i))
             element.append(e_items)
         else:
             element.set('value', str(json_dict))

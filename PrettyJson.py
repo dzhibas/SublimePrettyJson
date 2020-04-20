@@ -50,9 +50,10 @@ class PrettyJsonBaseCommand:
     bracket_newline = re.compile(r'^((\s*)".*?":)\s*([\[])', re.MULTILINE)
 
     @staticmethod
-    def json_loads(selection: str) -> dict:
+    def json_loads(selection: str, object_pairs_hook=None) -> dict:
+        hook = OrderedDict if object_pairs_hook is None else object_pairs_hook
         return json.loads(
-            selection, object_pairs_hook=OrderedDict, parse_float=decimal.Decimal
+            selection, object_pairs_hook=hook, parse_float=decimal.Decimal
         )
 
     @staticmethod
@@ -188,12 +189,15 @@ class PrettyJsonBaseCommand:
         self.phantom_set.update(self.phantoms)
 
     def syntax_to_json(self):
-        self.view.set_syntax_file(json_syntax)
+        syntax = os.path.splitext(os.path.basename(self.view.settings().get('syntax')))[0]
+        as_json = [i.lower() for i in s.get('as_json', ['JSON'])]
+        if syntax.lower() not in as_json:
+            self.view.set_syntax_file(json_syntax)
 
 
 class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     def run(self, edit):
-        self.clear_phantoms(self)
+        self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
             region, _ = self.get_selection_from_region(
@@ -204,14 +208,7 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 continue
 
             try:
-                self.json_loads(self.view.substr(region))
-            except Exception as ex:
-                self.show_exception(region=region, msg=ex)
-                return
-
-            try:
-                decoder = json.JSONDecoder(object_pairs_hook=self.duplicate_key_hook)
-                decoder.decode(self.view.substr(region))
+                self.json_loads(self.view.substr(region), self.duplicate_key_hook)
             except Exception as ex:
                 self.show_exception(region=region, msg=ex)
                 return
@@ -258,18 +255,18 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
             except Exception as ex:
                 try:
-                    amount_of_single_quotes = re.findall(
+                    count_single_quotes = re.findall(
                         r"(\'[^\']+\'?)", selection_text
                     )
                     amount_of_double_quotes = re.findall(
                         r"(\"[^\"]+\"?)", selection_text
                     )
 
-                    if len(amount_of_single_quotes) >= len(amount_of_double_quotes):
-                        selection_text_modified = re.sub(
+                    if len(count_single_quotes) >= len(amount_of_double_quotes):
+                        modified_text = re.sub(
                             r"(?:\'([^\']+)\'?)", r'"\1"', selection_text
                         )
-                        obj = self.json_loads(selection_text_modified)
+                        obj = self.json_loads(modified_text)
                         json_text = self.json_dumps(obj=obj, minified=False)
 
                         if not entire_file and s.get('reindent_block', False):

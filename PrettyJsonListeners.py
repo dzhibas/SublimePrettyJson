@@ -15,7 +15,7 @@ class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand
         if any(
             syntax in view.settings().get("syntax") for syntax in as_json
         ):
-            PrettyJsonBaseCommand.clear_phantoms(self)
+            self.clear_phantoms()
             json_content = view.substr(sublime.Region(0, view.size()))
             try:
                 self.json_loads(json_content)

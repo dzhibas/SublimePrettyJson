@@ -16,7 +16,6 @@
     "reindent_block": "minimal",
     // Name or Path to jq binary
     // Example: /usr/bin/local/jq
-    // Example: jq
     "jq_binary": "jq",
     "jq_errors": false,
     "as_json":[

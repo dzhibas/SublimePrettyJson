@@ -1,0 +1,7 @@
+Version 1.0.4 (April 22, 2020)
+-------------------------------
+
+  * Sublime Text 3 Users
+    If upgrading from any version prior to 1.0.0
+    such as `.no-sublime-package` release
+    please full restart Sublime Text

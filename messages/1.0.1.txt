@@ -1,0 +1,11 @@
+Version 1.0.1 (April 17, 2020)
+-------------------------------
+
+  * Implement the following PR's
+    - #80 - Fixes issues with incorrect
+      line returns
+    - #81 - Fixes sorting arrays
+    - #88 - Fixes array sorting
+    - #112 - Remove `.no-sublime-package`
+      Broken logic for empty regions and entire file
+    - #113 - Duplicate key detection

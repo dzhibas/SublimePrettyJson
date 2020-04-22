@@ -1,0 +1,5 @@
+Version 1.0.4 (April 17, 2020)
+-------------------------------
+
+  * Added `.gitattributes` to stop
+  shipping `/tests` with releases

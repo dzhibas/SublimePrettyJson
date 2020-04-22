@@ -1,0 +1,4 @@
+Version 1.0.3 (April 17, 2020)
+-------------------------------
+
+  * Fix incorrect message for Valid JSON

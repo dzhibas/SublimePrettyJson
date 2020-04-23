@@ -302,13 +302,16 @@ class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
             (
                 selection,
                 selected_entire_file,
-            ) = PrettyJsonBaseCommand.get_selection_from_region(
+            ) = self.get_selection_from_region(
                 region=region, regions_length=len(regions), view=self.view
             )
             if selection is None:
                 continue
 
             for jsonl in sorted(self.view.split_by_newlines(selection), reverse=True):
+                if self.view.substr(jsonl).strip() == "":
+                    continue
+
                 if jsonl.empty() and len(jsonl) > 1:
                     continue
 
@@ -395,7 +398,7 @@ class JqPrettyJson(sublime_plugin.WindowCommand):
         regions = view.sel()
         for region in regions:
             (selection, _,) = PrettyJsonBaseCommand.get_selection_from_region(
-                region=region, regions_length=len(regions), view=self.view
+                region=region, regions_length=len(regions), view=view
             )
             if selection is None:
                 continue

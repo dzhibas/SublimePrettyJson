@@ -1,20 +1,7 @@
 """Drop-in replacement for collections.OrderedDict by Raymond Hettinger
-
 http://code.activestate.com/recipes/576693/
-
 """
 from UserDict import DictMixin
-
-# Modified from original to support Python 2.4, see
-# http://code.google.com/p/simplejson/issues/detail?id=53
-try:
-    all
-except NameError:
-    def all(seq):
-        for elem in seq:
-            if not elem:
-                return False
-        return True
 
 class OrderedDict(dict, DictMixin):
 
@@ -63,12 +50,7 @@ class OrderedDict(dict, DictMixin):
     def popitem(self, last=True):
         if not self:
             raise KeyError('dictionary is empty')
-        # Modified from original to support Python 2.4, see
-        # http://code.google.com/p/simplejson/issues/detail?id=53
-        if last:
-            key = reversed(self).next()
-        else:
-            key = iter(self).next()
+        key = reversed(self).next() if last else iter(self).next()
         value = self.pop(key)
         return key, value
 

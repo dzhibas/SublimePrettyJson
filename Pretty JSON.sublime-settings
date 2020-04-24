@@ -1,12 +1,27 @@
 {
     "use_entire_file_if_no_selection": true,
-    "indent": 2,
+    "indent": 4,
     "sort_keys": false,
-    "ensure_ascii": false,
+    "ensure_ascii": true,
     "line_separator": ",",
     "value_separator": ": ",
     "keep_arrays_single_line": false,
     "max_arrays_line_length": 120,
     "pretty_on_save": false,
-    "validate_on_save": true
+    "validate_on_save": true,
+    "brace_newline": true,
+    "bracket_newline": true,
+    // Default: False
+    // Valid Options: False, start, minimal
+    "reindent_block": "minimal",
+    // Name or Path to jq binary
+    // Example: /usr/bin/local/jq
+    "jq_binary": "jq",
+    "jq_errors": false,
+    "as_json":[
+     "JSON",
+     "Sublime Text Commands",
+     "Sublime Text Settingss",
+     "Sublime Text Menu"
+ ]
 }

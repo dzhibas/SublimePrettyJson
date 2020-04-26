@@ -4,17 +4,26 @@ Prettify/Minify/Query/Goto/Validate/Lint JSON plugin for Sublime Text 3 & 4
 
 ## Installation
 
+### Package Control (Recommended)
+
 Install this sublime text 3/4 package via [Package Control][] 
 search for package: "[**Pretty JSON**][]"
 
-### or manually install
+### Manual Installation
 
-- `cd <Packages directory>`
-    (for example on Mac it is 
-    `~/Library/Application\ Support/Sublime\ Text\ 3/Packages` 
-    or 
-    `~/Library Application\ Support/Sublime\ Text/Packages`)
+**Sublime Text 4**
+
+- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
+
+**Sublime Text 3**
+
+- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
+- `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
+- `git checkout st3`
+
+**Sublime Text 2**
+No longer supported
 
 ## Usage
 
@@ -26,7 +35,7 @@ To prettify JSON, make selection of json
 - OS X: <kbd>cmd+ctrl+j</kbd>
 
 or through Command Palette <kbd>Ctrl+Shift+P</kbd> 
-find "Pretty JSON: Format (Pretty Print) JSON" 
+find "Pretty JSON: Format JSON" 
 (you can search for part of it like 'pretty format')
 
 If selection is empty and configuration entry 
@@ -46,7 +55,7 @@ In case of found errors view will jump to error and will highlight it
 ### Compress / Minify JSON
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> 
-find "Pretty JSON: Minify (compress) JSON" 
+find "Pretty JSON: Minify JSON" 
 (you can search for part of it like 'json minify') 
 this will make selection or full buffer as single line 
 JSON which later you can use in command lines (curl/httpie) or somewhere else...
@@ -62,7 +71,7 @@ you can add a setting like this to your .sublime-keymap file
 ### Convert JSON to XML
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> search for 
-"Pretty JSON: JSON 2 XML" (you can search for part of it like '2XML') 
+"Pretty JSON: json2xml" (you can search for part of it like '2XML') 
 this will convert your selected JSON of full buffer to XML and 
 replace syntax and buffer to XML output
 

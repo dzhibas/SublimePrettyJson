@@ -50,10 +50,9 @@ class PrettyJsonBaseCommand:
     bracket_newline = re.compile(r'^((\s*)".*?":)\s*([\[])', re.MULTILINE)
 
     @staticmethod
-    def json_loads(selection: str, object_pairs_hook=None) -> dict:
-        hook = OrderedDict if object_pairs_hook is None else object_pairs_hook
+    def json_loads(selection: str, object_pairs_hook=OrderedDict) -> dict:
         return json.loads(
-            selection, object_pairs_hook=hook, parse_float=decimal.Decimal
+            selection, object_pairs_hook=object_pairs_hook, parse_float=decimal.Decimal
         )
 
     @staticmethod

@@ -13,21 +13,13 @@ search for package: "[**Pretty JSON**][]"
 
 **Sublime Text 4**
 
-- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
+- `cd <Packages directory>` (MacOS: `~/Library/Application\ Support/Sublime\ Text/Packages`)
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
 
 **Sublime Text 3**
 
-**Sublime Text 4**
-
-- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
+- `cd <Packages directory>`    (MacOS: `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
-
-**Sublime Text 3**
-
-- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
-- `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
-- `git checkout st3`
 
 **Sublime Text 2**
 No longer supported

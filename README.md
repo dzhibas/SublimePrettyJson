@@ -18,6 +18,13 @@ search for package: "[**Pretty JSON**][]"
 
 **Sublime Text 3**
 
+**Sublime Text 4**
+
+- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
+- `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
+
+**Sublime Text 3**
+
 - `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
 - `git checkout st3`

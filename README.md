@@ -8,8 +8,16 @@ Install this sublime text 2/3 package via [Package Control](https://sublime.wbon
 
 ### or manually install
 
+**Sublime Text 4**
+
 - `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
-- `git clone https://github.com/dzhibas/SublimePrettyJson.git`
+- `git clone https://github.com/dzhibas/SublimePrettyJson.git` "Pretty JSON"
+
+**Sublime Text 3**
+
+- `cd <Packages directory>`   (for example on Mac it is `~/Library/Application\ Support/Sublime\ Text\ 2/Packages` or `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
+- `git clone https://github.com/dzhibas/SublimePrettyJson.git` "Pretty JSON"
+- `git checkout st3`
 
 ## Usage
 

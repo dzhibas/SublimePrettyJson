@@ -50,10 +50,9 @@ class PrettyJsonBaseCommand:
     bracket_newline = re.compile(r'^((\s*)".*?":)\s*([\[])', re.MULTILINE)
 
     @staticmethod
-    def json_loads(selection: str, object_pairs_hook=None) -> dict:
-        hook = OrderedDict if object_pairs_hook is None else object_pairs_hook
+    def json_loads(selection: str, object_pairs_hook=OrderedDict) -> dict:
         return json.loads(
-            selection, object_pairs_hook=hook, parse_float=decimal.Decimal
+            selection, object_pairs_hook=object_pairs_hook, parse_float=decimal.Decimal
         )
 
     @staticmethod
@@ -410,6 +409,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                 PREVIOUS_CONTENT[0] = raw_json
             if PREVIOUS_CONTENT[1] == "":
                 PREVIOUS_CONTENT[1] = raw_json
+
             out, err = p.communicate(bytes(raw_json, "UTF-8"))
             output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
             errors = err.decode("UTF-8").replace(os.linesep, "\n").strip()

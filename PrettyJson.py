@@ -409,6 +409,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                 PREVIOUS_CONTENT[0] = raw_json
             if PREVIOUS_CONTENT[1] == "":
                 PREVIOUS_CONTENT[1] = raw_json
+
             out, err = p.communicate(bytes(raw_json, "UTF-8"))
             output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
             errors = err.decode("UTF-8").replace(os.linesep, "\n").strip()

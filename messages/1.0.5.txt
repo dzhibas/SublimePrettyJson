@@ -1,0 +1,5 @@
+Version 1.0.5 (April 28, 2020)
+-------------------------------
+
+* Sublime Text 3 Users
+  - Update to latest Simple Json

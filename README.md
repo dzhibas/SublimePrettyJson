@@ -20,6 +20,8 @@ search for package: "[**Pretty JSON**][]"
 
 - `cd <Packages directory>`    (MacOS: `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`)
 - `git clone https://github.com/dzhibas/SublimePrettyJson.git "Pretty JSON"`
+- `cd Pretty JSON`
+- `git checkout st3`
 
 **Sublime Text 2**
 No longer supported

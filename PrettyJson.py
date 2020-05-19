@@ -131,7 +131,7 @@ class PrettyJsonBaseCommand:
         return '\n'.join(lines)
 
     def show_exception(self, region: sublime.Region = None, msg=str()):
-        sublime.status_message(f'[Error]: {msg}')
+        sublime.message_dialog(f'[Error]: {msg}')
         if region is None:
             sublime.message_dialog(f'[Error]: {msg}')
             return

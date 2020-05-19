@@ -15,6 +15,7 @@ class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand
         if any(
             syntax in view.settings().get("syntax") for syntax in as_json
         ):
+            self.view = view
             self.clear_phantoms()
             json_content = view.substr(sublime.Region(0, view.size()))
             try:
@@ -32,4 +33,4 @@ class PrettyJsonAutoPrettyOnSaveListener(sublime_plugin.EventListener):
         if any(
             syntax in view.settings().get('syntax') for syntax in as_json
         ):
-            sublime.active_window().run_command('pretty_json')
+            sublime.active_window().active_view().run_command('pretty_json')

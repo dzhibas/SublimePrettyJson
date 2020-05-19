@@ -6,10 +6,6 @@
         "command": "pretty_json"
     },
     {
-        "keys": ["ctrl+alt+shift+j"],
-        "command": "jq_query_pretty_json"
-    },
-    {
         "keys": ["ctrl+r"],
         "command": "pretty_json_goto_symbol",
         "context": [

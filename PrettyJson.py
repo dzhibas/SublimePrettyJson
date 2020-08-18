@@ -15,10 +15,10 @@ from .lib.simplejson import OrderedDict
 PREVIOUS_CONTENT = [str(), str()]
 PREVIOUS_QUERY_LEN = int()
 
-s = sublime.load_settings('Pretty JSON.sublime-settings')
+s = {}
 
-xml_syntax = 'Packages/XML/XML.tmLanguage'
-json_syntax = 'Packages/JSON/JSON.tmLanguage'
+xml_syntax = 'Packages/XML/XML.sublime-syntax'
+json_syntax = 'Packages/JSON/JSON.sublime-syntax'
 
 jq_exists = bool()
 jq_init = bool()
@@ -89,10 +89,10 @@ class PrettyJsonBaseCommand:
                 replacement = f'[{join_separator.join(items)}]'
                 if len(replacement) <= s.get('max_arrays_line_length', 120):
                     output_json = output_json.replace(m, replacement, 1)
-        elif s.get("bracket_newline", True):
+        elif s.get('bracket_newline', True):
             output_json = PrettyJsonBaseCommand.bracket_newline.sub(r'\1\n\2\3', output_json)
 
-        if s.get("brace_newline", True):
+        if s.get('brace_newline', True):
             output_json = PrettyJsonBaseCommand.brace_newline.sub(r'\1\n\2\3', output_json)
 
         return output_json
@@ -104,7 +104,7 @@ class PrettyJsonBaseCommand:
         entire_file = False
         if region.empty() and regions_length > 1:
             return None, None
-        elif region.empty() and s.get("use_entire_file_if_no_selection", True):
+        elif region.empty() and s.get('use_entire_file_if_no_selection', True):
             region = sublime.Region(0, view.size())
             entire_file = True
 
@@ -212,13 +212,13 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 self.show_exception(region=region, msg=ex)
                 return
 
-            sublime.status_message("JSON Valid")
+            sublime.status_message('JSON Valid')
 
     def duplicate_key_hook(self, pairs):
         result = dict()
         for key, val in pairs:
             if key in result:
-                raise KeyError(f"Duplicate key specified: {key}")
+                raise KeyError(f'Duplicate key specified: {key}')
             result[key] = val
         return result
 
@@ -255,15 +255,15 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             except Exception as ex:
                 try:
                     count_single_quotes = re.findall(
-                        r"(\'[^\']+\'?)", selection_text
+                        r'(\'[^\']+\'?)', selection_text
                     )
                     amount_of_double_quotes = re.findall(
-                        r"(\"[^\"]+\"?)", selection_text
+                        r'(\"[^\"]+\"?)', selection_text
                     )
 
                     if len(count_single_quotes) >= len(amount_of_double_quotes):
                         modified_text = re.sub(
-                            r"(?:\'([^\']+)\'?)", r'"\1"', selection_text
+                            r'(?:\'([^\']+)\'?)', r'"\1"', selection_text
                         )
                         obj = self.json_loads(modified_text)
                         json_text = self.json_dumps(obj=obj, minified=False)
@@ -281,7 +281,7 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
 
 class PrettyJsonAndSortCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
-    ''' 
+    '''
     Description: Pretty print json with forced sorting
     '''
 
@@ -322,44 +322,47 @@ class UnPrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
 class JqInsertPrettyJsonCommand(sublime_plugin.TextCommand):
     def run(self, edit, string):
+        self.view.set_read_only(False)
         self.view.replace(edit, sublime.Region(0, self.view.size()), string)
+        self.view.set_read_only(True)
 
 
 class JqPrettyJsonCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        original_view = self.view
-        syntax_file = original_view.settings().get("syntax")
+        syntax_file = self.view.settings().get('syntax')
 
-        total_region = sublime.Region(0, original_view.size())
-        content = original_view.substr(total_region)
+        total_region = sublime.Region(0, self.view.size())
+        content = self.view.substr(total_region)
 
-        sublime.run_command("new_window")
+        sublime.run_command('new_window')
         preview_window = sublime.active_window()
 
         preview_window.run_command(
-            "set_layout",
+            'set_layout',
             {
-                "cols": [0.0, 0.5, 1.0],
-                "rows": [0.0, 1.0],
-                "cells": [[0, 0, 1, 1], [1, 0, 2, 1]],
+                'cols': [0.0, 0.5, 1.0],
+                'rows': [0.0, 1.0],
+                'cells': [[0, 0, 1, 1], [1, 0, 2, 1]],
             },
         )
 
         preview_window.focus_group(1)
         preview_view = preview_window.new_file()
         preview_view.set_scratch(True)
-        preview_view.set_name("Preview")
+        preview_view.set_read_only(True)
+        preview_view.set_name('Preview')
         preview_view.sel().clear()
 
         preview_window.focus_group(0)
+
         jq_view = preview_window.new_file()
-        jq_view.run_command("jq_insert_pretty_json", {"string": content})
+        jq_view.run_command('jq_insert_pretty_json', {'string': content})
         jq_view.set_read_only(True)
         jq_view.set_scratch(True)
         jq_view.sel().clear()
 
         jq_view.set_syntax_file(syntax_file)
-        preview_view.set_syntax_file(json_syntax)
+        preview_view.set_syntax_file(syntax_file)
 
 
 class JqQueryPrettyJson(sublime_plugin.WindowCommand):
@@ -367,23 +370,35 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
     Description: ./jq integration
     """
 
+    def is_enabled(self):
+        as_json = s.get('as_json', ['JSON'])
+        return any(
+            syntax in self.window.active_view().settings().get('syntax') for syntax in as_json
+        )
+
+    def is_visible(self):
+        as_json = s.get('as_json', ['JSON'])
+        return any(
+            syntax in self.window.active_view().settings().get('syntax') for syntax in as_json
+        )
+
     def run(self):
         check_jq()
         if jq_exists:
             preview_view = self.window.active_view()
-            preview_view.run_command("jq_pretty_json")
+            preview_view.run_command('jq_pretty_json')
             sublime.active_window().show_input_panel(
-                "Enter ./jq filter expression", ".", self.done, self.send_query, None,
+                'Enter ./jq filter expression', '.', self.done, self.send_query, None,
             )
         else:
             sublime.status_message(
-                "./jq tool is not available on your system. http://stedolan.github.io/jq"
+                './jq tool is not available on your system. http://stedolan.github.io/jq'
             )
 
     def get_content(self):
         """ returns content of active view or selected region """
-        view = self.window.active_view_in_group(0)
-        selection = str()
+        view = self.window.active_view()
+        selection = ''
         regions = view.sel()
         for region in regions:
             if region.empty() and len(regions) > 1:
@@ -405,16 +420,18 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
             )
             QUERY_LEN = len(query)
             raw_json = self.get_content()
-            if PREVIOUS_CONTENT[0] == "":
+
+            if not PREVIOUS_CONTENT[0]:
                 PREVIOUS_CONTENT[0] = raw_json
-            if PREVIOUS_CONTENT[1] == "":
+            if not PREVIOUS_CONTENT[1]:
                 PREVIOUS_CONTENT[1] = raw_json
 
-            out, err = p.communicate(bytes(raw_json, "UTF-8"))
-            output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
-            errors = err.decode("UTF-8").replace(os.linesep, "\n").strip()
+            out, err = p.communicate(bytes(raw_json, 'UTF-8'))
+            output = out.decode('UTF-8').replace(os.linesep, '\n').strip()
+            errors = err.decode('UTF-8').replace(os.linesep, '\n').strip()
             jq_view = sublime.active_window().active_view_in_group(1)
-            if output and output != "null":
+
+            if output and output != 'null':
                 if QUERY_LEN > PREVIOUS_QUERY_LEN:
                     PREVIOUS_CONTENT[0] = PREVIOUS_CONTENT[1]
                     PREVIOUS_CONTENT[1] = output
@@ -422,14 +439,14 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                     PREVIOUS_CONTENT[1] = PREVIOUS_CONTENT[0]
                     PREVIOUS_CONTENT[0] = output
                 PREVIOUS_QUERY_LEN = len(query)
-            elif s.get("jq_errors", False) and errors:
-                output = errors        
+            elif s.get('jq_errors', False) and errors:
+                output = errors
             else:
                 if PREVIOUS_QUERY_LEN <= QUERY_LEN:
                     output = PREVIOUS_CONTENT[1]
                 else:
                     output = PREVIOUS_CONTENT[0]
-            jq_view.run_command("jq_insert_pretty_json", {"string": output})
+            jq_view.run_command('jq_insert_pretty_json', {'string': output})
 
         except OSError as ex:
             sublime.status_message(str(ex))

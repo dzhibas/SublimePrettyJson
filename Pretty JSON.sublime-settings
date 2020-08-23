@@ -19,9 +19,9 @@
     "jq_binary": "jq",
     "jq_errors": false,
     "as_json":[
-     "Packages/JSON/JSON.sublime-syntax",
-     "Packages/PackageDev/Package/Sublime Text Commands/Sublime Text Commands.sublime-syntax",
-     "Packages/PackageDev/Package/Sublime Text Settings/Sublime Text Settings.sublime-syntax",
-     "Packages/PackageDev/Package/Sublime Text Menu/Sublime Text Menu.sublime-syntax"
+        "Packages/JSON/JSON.sublime-syntax",
+        "Packages/PackageDev/Package/Sublime Text Commands/Sublime Text Commands.sublime-syntax",
+        "Packages/PackageDev/Package/Sublime Text Settings/Sublime Text Settings.sublime-syntax",
+        "Packages/PackageDev/Package/Sublime Text Menu/Sublime Text Menu.sublime-syntax"
  ]
 }

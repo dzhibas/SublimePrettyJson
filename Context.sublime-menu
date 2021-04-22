@@ -4,7 +4,7 @@
   "children": [
       {"caption": "Pretty JSON","command": "pretty_json"},
       {"caption": "Format and Sort JSON","command": "pretty_json_and_sort"},
-      {"caption": "Minify JSON","command": "un_pretty_json"}
-      {"caption": "JSON to XML","command": "json_to_xml"},
+      {"caption": "Minify JSON","command": "un_pretty_json"},
+      {"caption": "JSON to XML","command": "json_to_xml"}
   ]
 }]

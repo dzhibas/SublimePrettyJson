@@ -2,11 +2,20 @@
 
 Prettify/Minify/Query/Goto/Validate/Lint JSON plugin for Sublime Text 3 & 4
 
+## Updates
+
+All keybindings have been removed in favor of the Command Palette. And to allow
+for users to configure their own specific key bindings.
+
+This also prevents key binding overrides which conflict with other packages. For
+good documentation on key bindings I recommend you review the [Offical Docs][] or
+[Community Docs][]
+
 ## Installation
 
 ### Package Control (Recommended)
 
-Install this sublime text 3/4 package via [Package Control][] 
+Install this sublime text 3 / 4 package via [Package Control][]
 search for package: "[**Pretty JSON**][]"
 
 ### Manual Installation
@@ -29,13 +38,7 @@ No longer supported
 ## Usage
 
 To prettify JSON, make selection of json 
-(or else it will try to use full view buffer) and press keys:
-
-- Linux: <kbd>ctrl+alt+j</kbd>
-- Windows: <kbd>ctrl+alt+j</kbd>
-- OS X: <kbd>cmd+ctrl+j</kbd>
-
-or through Command Palette <kbd>Ctrl+Shift+P</kbd> 
+(or else it will try to use full view buffer) and through Command Palette <kbd>Ctrl+Shift+P</kbd>
 find "Pretty JSON: Format JSON" 
 (you can search for part of it like 'pretty format')
 
@@ -192,3 +195,6 @@ If you YAMLing then maybe you interested in this plugin: [PrettyYAML][]
 [**Pretty JSON**]: https://packagecontrol.io/packages/Pretty%20JSON
 [PrettyYAML]: https://github.com/aukaost/SublimePrettyYAML
 [./jq]: http://stedolan.github.io/jq/
+[Offical Docs]: https://www.sublimetext.com/docs/key_bindings.html
+[Community Docs]: https://docs.sublimetext.io/guide/customization/key_bindings.html
+

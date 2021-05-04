@@ -37,7 +37,7 @@ def check_jq():
         jq_path = shutil.which(jq_test)
         jq_exists = True
     except OSError as ex:
-        print(str(ex))
+        sublime.message_dialog(f'[Error]: {ex}')
         jq_exists = False
 
 
@@ -240,8 +240,8 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             if region is None:
                 continue
 
+            selection_text = self.view.substr(region)
             try:
-                selection_text = self.view.substr(region)
                 obj = self.json_loads(selection_text)
 
                 json_text = self.json_dumps(obj=obj, minified=False)

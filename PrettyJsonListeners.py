@@ -13,7 +13,6 @@ class PrettyJsonLintListener(sublime_plugin.EventListener, PrettyJsonBaseCommand
 
         as_json = s.get("as_json", ["JSON"])
         if any(syntax in view.settings().get("syntax") for syntax in as_json):
-            self.view = view
             self.clear_phantoms()
             json_content = view.substr(sublime.Region(0, view.size()))
             try:

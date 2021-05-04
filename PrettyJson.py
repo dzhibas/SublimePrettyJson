@@ -50,7 +50,7 @@ class PrettyJsonBaseCommand:
     bracket_newline = re.compile(r'^((\s*)".*?":)\s*([\[])', re.MULTILINE)
 
     @staticmethod
-    def json_loads(selection: str, object_pairs_hook=OrderedDict) -> dict:
+    def json_loads(selection: str, object_pairs_hook=OrderedDict):
         return json.loads(
             selection, object_pairs_hook=object_pairs_hook, parse_float=decimal.Decimal
         )
@@ -100,7 +100,7 @@ class PrettyJsonBaseCommand:
     @staticmethod
     def get_selection_from_region(
         region: sublime.Region, regions_length: int, view: sublime.View
-    ) -> sublime.Region:
+    ):
         entire_file = False
         if region.empty() and regions_length > 1:
             return None, None
@@ -110,9 +110,10 @@ class PrettyJsonBaseCommand:
 
         return region, entire_file
 
-    def reindent(self, text: str, selection: str):
+    def reindent(self, text: str, selection: sublime.Region):
         current_line = self.view.line(selection.begin())
         text_before_sel = sublime.Region(current_line.begin(), selection.begin())
+        indent_space = ''
 
         reindent_mode = s.get('reindent_block', False)
         if reindent_mode == 'start':
@@ -371,12 +372,18 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
     """
 
     def is_enabled(self):
+        if not self.window:
+            return
+
         as_json = s.get('as_json', ['JSON'])
         return any(
             syntax in self.window.active_view().settings().get('syntax') for syntax in as_json
         )
 
     def is_visible(self):
+        if not self.window:
+            return
+
         as_json = s.get('as_json', ['JSON'])
         return any(
             syntax in self.window.active_view().settings().get('syntax') for syntax in as_json
@@ -423,6 +430,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
 
             if not PREVIOUS_CONTENT[0]:
                 PREVIOUS_CONTENT[0] = raw_json
+
             if not PREVIOUS_CONTENT[1]:
                 PREVIOUS_CONTENT[1] = raw_json
 

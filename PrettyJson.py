@@ -375,18 +375,26 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
         if not self.window:
             return
 
+        view = self.window.active_view()
+        if not view:
+            return
+
         as_json = s.get('as_json', ['JSON'])
         return any(
-            syntax in self.window.active_view().settings().get('syntax') for syntax in as_json
+            syntax in view.settings().get('syntax', '') for syntax in as_json
         )
 
     def is_visible(self):
         if not self.window:
             return
 
+        view = self.window.active_view()
+        if not view:
+            return
+
         as_json = s.get('as_json', ['JSON'])
         return any(
-            syntax in self.window.active_view().settings().get('syntax') for syntax in as_json
+            syntax in view.settings().get('syntax', '') for syntax in as_json
         )
 
     def run(self):

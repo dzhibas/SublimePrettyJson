@@ -83,12 +83,13 @@ class PrettyJsonBaseCommand:
             matches.sort(key=len, reverse=True)
             join_separator = line_separator.ljust(2)
             for m in matches:
-                content = m[1:-1]
-                items = [a.strip() for a in content.split(line_separator.strip())]
-
+                content = m[1:-1].strip()
+                items = [a.strip() for a in content.split(os.linesep)]
+                items = [item[:-1] if item[-1] == ',' else item for item in items]
                 replacement = f'[{join_separator.join(items)}]'
                 if len(replacement) <= s.get('max_arrays_line_length', 120):
                     output_json = output_json.replace(m, replacement, 1)
+
         elif s.get('bracket_newline', True):
             output_json = PrettyJsonBaseCommand.bracket_newline.sub(r'\1\n\2\3', output_json)
 

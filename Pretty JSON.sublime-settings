@@ -2,7 +2,7 @@
     "use_entire_file_if_no_selection": true,
     "indent": 4,
     "sort_keys": false,
-    "ensure_ascii": true,
+    "ensure_ascii": false,
     "line_separator": ",",
     "value_separator": ": ",
     "keep_arrays_single_line": false,

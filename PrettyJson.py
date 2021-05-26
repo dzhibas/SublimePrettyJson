@@ -15,8 +15,6 @@ from .lib.simplejson import OrderedDict
 PREVIOUS_CONTENT = [str(), str()]
 PREVIOUS_QUERY_LEN = int()
 
-s = {}
-
 xml_syntax = 'Packages/XML/XML.sublime-syntax'
 json_syntax = 'Packages/JSON/JSON.sublime-syntax'
 
@@ -27,12 +25,13 @@ jq_path = str()
 
 def check_jq():
     global jq_init, jq_exists, jq_path
+    settings = sublime.load_settings('Pretty JSON.sublime-settings')
 
     if jq_init:
         return
 
     jq_init = True
-    jq_test = s.get('jq_binary', 'jq')
+    jq_test = settings.get('jq_binary', 'jq')
     try:
         jq_path = shutil.which(jq_test)
         jq_exists = True
@@ -57,20 +56,22 @@ class PrettyJsonBaseCommand:
 
     @staticmethod
     def json_dumps(obj, minified: bool = False) -> str:
-        sort_keys = s.get('sort_keys', False)
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
+
+        sort_keys = settings.get('sort_keys', False)
         if PrettyJsonBaseCommand.force_sorting:
             sort_keys = True
 
-        line_separator = s.get('line_separator', ',')
-        value_separator = s.get('value_separator', ': ')
+        line_separator = settings.get('line_separator', ',')
+        value_separator = settings.get('value_separator', ': ')
         if minified:
             line_separator = line_separator.strip()
             value_separator = value_separator.strip()
 
         output_json = json.dumps(
             obj,
-            indent=None if minified else s.get('indent', 2),
-            ensure_ascii=s.get('ensure_ascii', False),
+            indent=None if minified else settings.get('indent', 2),
+            ensure_ascii=settings.get('ensure_ascii', False),
             sort_keys=sort_keys,
             separators=(line_separator, value_separator),
             use_decimal=True,
@@ -78,7 +79,7 @@ class PrettyJsonBaseCommand:
         if minified:
             return output_json
 
-        if s.get('keep_arrays_single_line', False):
+        if settings.get('keep_arrays_single_line', False):
             matches = re.findall(r'(\[[^\[\]]+?\])', output_json)
             matches.sort(key=len, reverse=True)
             join_separator = line_separator.ljust(2)
@@ -87,13 +88,13 @@ class PrettyJsonBaseCommand:
                 items = [a.strip() for a in content.split(os.linesep)]
                 items = [item[:-1] if item[-1] == ',' else item for item in items]
                 replacement = f'[{join_separator.join(items)}]'
-                if len(replacement) <= s.get('max_arrays_line_length', 120):
+                if len(replacement) <= settings.get('max_arrays_line_length', 120):
                     output_json = output_json.replace(m, replacement, 1)
 
-        elif s.get('bracket_newline', True):
+        elif settings.get('bracket_newline', True):
             output_json = PrettyJsonBaseCommand.bracket_newline.sub(r'\1\n\2\3', output_json)
 
-        if s.get('brace_newline', True):
+        if settings.get('brace_newline', True):
             output_json = PrettyJsonBaseCommand.brace_newline.sub(r'\1\n\2\3', output_json)
 
         return output_json
@@ -102,21 +103,23 @@ class PrettyJsonBaseCommand:
     def get_selection_from_region(
         region: sublime.Region, regions_length: int, view: sublime.View
     ):
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
         entire_file = False
         if region.empty() and regions_length > 1:
             return None, None
-        elif region.empty() and s.get('use_entire_file_if_no_selection', True):
+        elif region.empty() and settings.get('use_entire_file_if_no_selection', True):
             region = sublime.Region(0, view.size())
             entire_file = True
 
         return region, entire_file
 
     def reindent(self, text: str, selection: sublime.Region):
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
         current_line = self.view.line(selection.begin())
         text_before_sel = sublime.Region(current_line.begin(), selection.begin())
         indent_space = ''
 
-        reindent_mode = s.get('reindent_block', False)
+        reindent_mode = settings.get('reindent_block', False)
         if reindent_mode == 'start':
             space_number = text_before_sel.size()
             indent_space = ' ' * space_number
@@ -190,8 +193,9 @@ class PrettyJsonBaseCommand:
         self.phantom_set.update(self.phantoms)
 
     def syntax_to_json(self):
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
         syntax = os.path.splitext(os.path.basename(self.view.settings().get('syntax')))[0]
-        as_json = [i.lower() for i in s.get('as_json', ['JSON'])]
+        as_json = [i.lower() for i in settings.get('as_json', ['JSON'])]
         if syntax.lower() not in as_json:
             self.view.set_syntax_file(json_syntax)
 
@@ -231,6 +235,8 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
+
         self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
@@ -246,7 +252,7 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 obj = self.json_loads(selection_text)
 
                 json_text = self.json_dumps(obj=obj, minified=False)
-                if not entire_file and s.get('reindent_block', False):
+                if not entire_file and settings.get('reindent_block', False):
                     json_text = self.reindent(json_text, region)
 
                 self.view.replace(edit, region, json_text)
@@ -270,7 +276,7 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                         obj = self.json_loads(modified_text)
                         json_text = self.json_dumps(obj=obj, minified=False)
 
-                        if not entire_file and s.get('reindent_block', False):
+                        if not entire_file and settings.get('reindent_block', False):
                             json_text = self.reindent(json_text, region)
 
                         self.view.replace(edit, region, json_text)
@@ -373,6 +379,8 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
     """
 
     def is_enabled(self):
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
+
         if not self.window:
             return
 
@@ -380,23 +388,13 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        as_json = s.get('as_json', ['JSON'])
+        as_json = settings.get('as_json', ['JSON'])
         return any(
             syntax in view.settings().get('syntax', '') for syntax in as_json
         )
 
     def is_visible(self):
-        if not self.window:
-            return
-
-        view = self.window.active_view()
-        if not view:
-            return
-
-        as_json = s.get('as_json', ['JSON'])
-        return any(
-            syntax in view.settings().get('syntax', '') for syntax in as_json
-        )
+        return self.is_enabled()
 
     def run(self):
         check_jq()
@@ -427,13 +425,14 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
 
     def send_query(self, query: str):
         global PREVIOUS_CONTENT, PREVIOUS_QUERY_LEN
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
         try:
             p = subprocess.Popen(
-                [jq_path, query],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                stdin=subprocess.PIPE,
-            )
+                    [jq_path, query],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    stdin=subprocess.PIPE,
+                )
             QUERY_LEN = len(query)
             raw_json = self.get_content()
 
@@ -456,7 +455,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                     PREVIOUS_CONTENT[1] = PREVIOUS_CONTENT[0]
                     PREVIOUS_CONTENT[0] = output
                 PREVIOUS_QUERY_LEN = len(query)
-            elif s.get('jq_errors', False) and errors:
+            elif settings.get('jq_errors', False) and errors:
                 output = errors
             else:
                 if PREVIOUS_QUERY_LEN <= QUERY_LEN:
@@ -479,6 +478,8 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
+        settings = sublime.load_settings('Pretty JSON.sublime-settings')
+
         self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
@@ -504,7 +505,7 @@ class JsonToXml(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 if type(xml_string) is bytes:
                     xml_string = xml_string.decode('utf-8')
 
-                if not entire_file and s.get('reindent_block', False):
+                if not entire_file and settings.get('reindent_block', False):
                     xml_string = self.reindent(xml_string, region)
 
                 self.view.replace(edit, region, xml_string)
@@ -584,8 +585,3 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
         self.view.sel().clear()
         self.view.sel().add(region)
         self.view.show(region)
-
-
-def plugin_loaded():
-    global s
-    s = sublime.load_settings('Pretty JSON.sublime-settings')

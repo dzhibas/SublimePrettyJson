@@ -4,6 +4,10 @@
         "command": "pretty_json"
     },
     {
+        "caption": "Pretty JSON: Format JSON Lines",
+        "command": "pretty_json_lines"
+    },
+    {
         "caption": "Pretty JSON: Format and Sort JSON",
         "command": "pretty_json_and_sort"
     },

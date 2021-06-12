@@ -88,14 +88,11 @@ class PrettyJsonBaseCommand:
                 items = [a.strip() for a in content.split(os.linesep)]
                 items = [item[:-1] if item[-1] == "," else item for item in items]
                 replacement = "["
-                print(items)
                 for index, item in enumerate(items):
                     if item in ('{', '}'):
                         replacement = replacement + item
                         if item == '}':
                             if index!= len(items)-1:
-                                print(items.index(item))
-                                print(len(items)-1)
                                 replacement = replacement + ','
                     else:
                         replacement = replacement + item
@@ -103,7 +100,6 @@ class PrettyJsonBaseCommand:
                             if items[items.index(item)+1] != '}':
                                 replacement = replacement + ','
                 replacement = replacement + ']'
-                print(replacement)
 
                 if len(replacement) <= settings.get("max_arrays_line_length", 120):
                     output_json = output_json.replace(m, replacement, 1)

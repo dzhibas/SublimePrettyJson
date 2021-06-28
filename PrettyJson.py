@@ -55,11 +55,11 @@ class PrettyJsonBaseCommand:
         )
 
     @staticmethod
-    def json_dumps(obj, minified: bool = False) -> str:
+    def json_dumps(obj, minified: bool = False, force_sorting: bool = False) -> str:
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
 
         sort_keys = settings.get("sort_keys", False)
-        if PrettyJsonBaseCommand.force_sorting:
+        if force_sorting:
             sort_keys = True
 
         line_separator = settings.get("line_separator", ",")
@@ -270,8 +270,7 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             selection_text = self.view.substr(region)
             try:
                 obj = self.json_loads(selection_text)
-
-                json_text = self.json_dumps(obj=obj, minified=False)
+                json_text = self.json_dumps(obj=obj, minified=False, force_sorting=self.force_sorting)
                 if not entire_file and settings.get("reindent_block", False):
                     json_text = self.reindent(json_text, region)
 

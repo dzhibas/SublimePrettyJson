@@ -1,25 +1,29 @@
 [
-{
-    "id": "preferences",
-    "children": [
     {
-        "id": "package-settings",
         "children": [
-        {
-            "caption": "Pretty JSON",
-            "children": [
             {
-                "caption": "Settings",
-                "command": "edit_settings",
-                "args":
-                {
-                    "base_file": "${packages}/Pretty JSON/Pretty JSON.sublime-settings",
-                    "default": "{\n\t$0\n}\n",
-                }
-            },
-            {
-                "caption": "-"
-            }]
-        }]
-    }]
-}]
+                "children": [
+                    {
+                        "caption": "Pretty JSON",
+                        "children": [
+                            {
+                                "args":
+                                {
+                                    "base_file": "${packages}/Pretty JSON/Pretty JSON.sublime-settings",
+                                    "default": "{\n\t$0\n}\n"
+                                },
+                                "caption": "Settings",
+                                "command": "edit_settings"
+                            },
+                            {
+                                "caption": "-"
+                            }
+                        ]
+                    }
+                ],
+                "id": "package-settings"
+            }
+        ],
+        "id": "preferences"
+    }
+]

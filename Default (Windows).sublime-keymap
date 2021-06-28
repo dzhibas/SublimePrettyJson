@@ -1,22 +1,22 @@
 [
-    {
-        "keys": [
-            "ctrl+alt+j"
-        ], 
-        "command": "pretty_json"
-    },
-    {
-        "keys": [
-            "ctrl+alt+m"
-        ], 
-        "command": "un_pretty_json"
-    },
-    {
-        "keys": ["ctrl+r"],
-        "command": "pretty_json_goto_symbol",
-        "context": [
-            { "key": "selector", "operator": "equal", "operand": "source.json" }
-        ]
-    }
+    // {
+    //     "keys": [
+    //         "ctrl+alt+j"
+    //     ],
+    //     "command": "pretty_json"
+    // },
+    // {
+    //     "keys": [
+    //         "ctrl+alt+m"
+    //     ],
+    //     "command": "un_pretty_json"
+    // },
+    // {
+    //     "keys": ["ctrl+r"],
+    //     "command": "pretty_json_goto_symbol",
+    //     "context": [
+    //         { "key": "selector", "operator": "equal", "operand": "source.json" }
+    //     ]
+    // }
 
 ]

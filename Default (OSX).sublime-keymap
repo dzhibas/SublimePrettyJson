@@ -1,15 +1,15 @@
 [
-    {
-        "keys": [
-            "super+ctrl+j"
-        ], 
-        "command": "pretty_json"
-    },
-    {
-        "keys": ["super+r"],
-        "command": "pretty_json_goto_symbol",
-        "context": [
-            { "key": "selector", "operator": "equal", "operand": "source.json" }
-        ]
-    }
+    // {
+    //     "keys": [
+    //         "super+ctrl+j"
+    //     ],
+    //     "command": "pretty_json"
+    // },
+    // {
+    //     "keys": ["super+r"],
+    //     "command": "pretty_json_goto_symbol",
+    //     "context": [
+    //         { "key": "selector", "operator": "equal", "operand": "source.json" }
+    //     ]
+    // }
 ]

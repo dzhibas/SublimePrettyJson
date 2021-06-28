@@ -2,7 +2,7 @@
     "use_entire_file_if_no_selection": true,
     "indent": 4,
     "sort_keys": false,
-    "ensure_ascii": true,
+    "ensure_ascii": false,
     "line_separator": ",",
     "value_separator": ": ",
     "keep_arrays_single_line": false,
@@ -19,9 +19,9 @@
     "jq_binary": "jq",
     "jq_errors": false,
     "as_json":[
-     "Packages/JSON/JSON.sublime-syntax",
-     "Packages/PackageDev/Package/Sublime Text Commands/Sublime Text Commands.sublime-syntax",
-     "Packages/PackageDev/Package/Sublime Text Settings/Sublime Text Settings.sublime-syntax",
-     "Packages/PackageDev/Package/Sublime Text Menu/Sublime Text Menu.sublime-syntax"
+        "Packages/JSON/JSON.sublime-syntax",
+        "Packages/PackageDev/Package/Sublime Text Commands/Sublime Text Commands.sublime-syntax",
+        "Packages/PackageDev/Package/Sublime Text Settings/Sublime Text Settings.sublime-syntax",
+        "Packages/PackageDev/Package/Sublime Text Menu/Sublime Text Menu.sublime-syntax"
  ]
 }

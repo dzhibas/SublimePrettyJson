@@ -1,2 +1,0 @@
-[tool.black]
-skip_string_normalization: True

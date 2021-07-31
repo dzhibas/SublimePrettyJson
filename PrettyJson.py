@@ -89,15 +89,15 @@ class PrettyJsonBaseCommand:
                 items = [item[:-1] if item[-1] == "," else item for item in items]
                 replacement = "["
                 for index, item in enumerate(items):
-                    if item in ('{', '}'):
+                    if item in ('{', '}') or item.endswith("{") or item.startswith("}"):
                         replacement = replacement + item
                         if item == '}':
-                            if index!= len(items)-1:
+                            if index != len(items)-1 and items[index+1] != "}":
                                 replacement = replacement + ','
                     else:
                         replacement = replacement + item
                         if index != len(items)-1:
-                            if items[items.index(item)+1] != '}':
+                            if items[index+1] != '}':
                                 replacement = replacement + ','
                 replacement = replacement + ']'
 

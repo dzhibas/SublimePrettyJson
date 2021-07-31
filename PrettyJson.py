@@ -55,11 +55,11 @@ class PrettyJsonBaseCommand:
         )
 
     @staticmethod
-    def json_dumps(obj, minified: bool = False) -> str:
+    def json_dumps(obj, minified: bool = False, force_sorting: bool = False) -> str:
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
 
         sort_keys = settings.get("sort_keys", False)
-        if PrettyJsonBaseCommand.force_sorting:
+        if force_sorting:
             sort_keys = True
 
         line_separator = settings.get("line_separator", ",")
@@ -87,7 +87,20 @@ class PrettyJsonBaseCommand:
                 content = m[1:-1].strip()
                 items = [a.strip() for a in content.split(os.linesep)]
                 items = [item[:-1] if item[-1] == "," else item for item in items]
-                replacement = f"[{join_separator.join(items)}]"
+                replacement = "["
+                for index, item in enumerate(items):
+                    if item in ('{', '}') or item.endswith("{") or item.startswith("}"):
+                        replacement = replacement + item
+                        if item == '}':
+                            if index != len(items)-1 and items[index+1] != "}":
+                                replacement = replacement + ','
+                    else:
+                        replacement = replacement + item
+                        if index != len(items)-1:
+                            if items[index+1] != '}':
+                                replacement = replacement + ','
+                replacement = replacement + ']'
+
                 if len(replacement) <= settings.get("max_arrays_line_length", 120):
                     output_json = output_json.replace(m, replacement, 1)
 
@@ -257,8 +270,7 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
             selection_text = self.view.substr(region)
             try:
                 obj = self.json_loads(selection_text)
-
-                json_text = self.json_dumps(obj=obj, minified=False)
+                json_text = self.json_dumps(obj=obj, minified=False, force_sorting=self.force_sorting)
                 if not entire_file and settings.get("reindent_block", False):
                     json_text = self.reindent(json_text, region)
 

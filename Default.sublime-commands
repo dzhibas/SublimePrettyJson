@@ -28,12 +28,12 @@
         "command": "pretty_json_validate"
     },
     {
-        "caption": "Preferences: Pretty JSON Settings",
-        "command": "edit_settings",
         "args":
         {
             "base_file": "${packages}/Pretty JSON/Pretty JSON.sublime-settings",
             "default": "{\n\t$0\n}\n"
-        }
+        },
+        "caption": "Preferences: Pretty JSON Settings",
+        "command": "edit_settings"
     }
 ]

@@ -72,6 +72,11 @@ you can add a setting like this to your .sublime-keymap file
   { "keys": [ "ctrl+alt+m" ], "command": "un_pretty_json" }
 ```
 
+#### List of commands that can be mapped to shortcuts
+- `pretty_json`
+- `un_pretty_json`
+- `pretty_json_goto_symbol`
+
 ### Convert JSON to XML
 
 Using Command Palette <kbd>Ctrl+Shift+P</kbd> search for 

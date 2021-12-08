@@ -415,6 +415,7 @@ class JqPrettyJsonCommand(sublime_plugin.TextCommand):
 
         sublime.run_command("new_window")
         preview_window = sublime.active_window()
+        preview_window.set_sidebar_visible(False)
 
         preview_window.run_command(
             "set_layout",

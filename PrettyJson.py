@@ -1,8 +1,10 @@
 import decimal
 import os
+import functools
 import re
 import subprocess
 import shutil
+import webbrowser
 from xml.etree import ElementTree as et
 
 import sublime
@@ -18,26 +20,10 @@ PREVIOUS_QUERY_LEN = int()
 xml_syntax = "Packages/XML/XML.sublime-syntax"
 json_syntax = "Packages/JSON/JSON.sublime-syntax"
 
-jq_exists = bool()
-jq_init = bool()
-jq_path = str()
 
-
-def check_jq():
-    global jq_init, jq_exists, jq_path
+def get_jq_path():
     settings = sublime.load_settings("Pretty JSON.sublime-settings")
-
-    if jq_init:
-        return
-
-    jq_init = True
-    jq_test = settings.get("jq_binary", "jq")
-    try:
-        jq_path = shutil.which(jq_test)
-        jq_exists = True
-    except OSError as ex:
-        sublime.message_dialog(f"[Error]: {ex}")
-        jq_exists = False
+    return shutil.which(settings.get("jq_binary", "jq"))
 
 
 class PrettyJsonBaseCommand:
@@ -466,21 +452,24 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
         return self.is_enabled()
 
     def run(self):
-        check_jq()
-        if jq_exists:
+        jq_path = get_jq_path()
+        if jq_path:
             preview_view = self.window.active_view()
             preview_view.run_command("jq_pretty_json")
             sublime.active_window().show_input_panel(
                 "Enter ./jq filter expression",
                 ".",
                 self.done,
-                self.send_query,
+                functools.partial(self.send_query, jq_path),
                 None,
             )
         else:
-            sublime.status_message(
-                "./jq tool is not available on your system. http://stedolan.github.io/jq"
-            )
+            if sublime.ok_cancel_dialog(
+                    "./jq tool is not available on your system. Do you want to open the jq website?",
+                    "Open JQ Website"
+                ):
+                webbrowser.open("http://stedolan.github.io/jq")
+
 
     def get_content(self):
         """returns content of active view or selected region"""
@@ -496,7 +485,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                 selection = region
         return view.substr(selection)
 
-    def send_query(self, query: str):
+    def send_query(self, jq_path: str, query: str):
         global PREVIOUS_CONTENT, PREVIOUS_QUERY_LEN
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
         try:

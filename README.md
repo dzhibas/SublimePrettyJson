@@ -98,81 +98,54 @@ You can find instructions of tool here:
 
 http://stedolan.github.io/jq/
 
-## Default configuration
+## Configuration
 
-- `use_entire_file_if_no_selection`
-    - Default: `true`
+Check all the available configuration keys and their default values by using the Command Palette <kbd>Ctrl+Shift+P</kbd> and searching for `Preferences: Pretty JSON Settings`. From there you can also configure your own values.
 
-- `indent`
-    - Default: `2`
-    - Integer represents amount of spaces
-    - `\t` will utilize a tab character
+Here's a run down of the existing parameters, their meaning, and how you can configure each of them:
 
-- `sort_keys`
-    - Default: `false`
-
-- `ensure_ascii`
-    - Default: `false`
-
-- `line_separator`
-    - ","
-
-- `value_separator`
-    - ": "
-    - Value separator in config, 
-    so if you need to get rid of extra space you can remove it with this param
-
-- `keep_arrays_single_line`
-    - Default: `false`
-    - If we need to re-structure arrays and make them single-line
-
-- `max_arrays_line_length`
-    - Default: `120`
-    - If array for example '["a", "b", 123213, ....]' 
-    length will reach max it will be kept multi-line
-
-- `pretty_on_save`
-    - Default: `false`
-    - Do we need to automatically Pretty JSON on save
-
-- `validate_on_save`
-    - Default: `true`
-    - Do we need validate JSON files on each save
-
-- `reindent_block`
-    - Default: `false`
-    - If we are formatting a selection, if we need to reindent the
-      resulting block to follow the flow of the source document
-      the posible values are 'minimal' and 'start'
+- `use_entire_file_if_no_selection`: boolean that indicates whether the entire file should be used when there is no text selected.
+- `indent`: integer that represents the number of spaces to be used. To use tab indentation, use `\t` instead.
+- `sort_keys`: boolean that indicates whether the JSON keys should be sorted alphabetically.
+- `ensure_ascii`: boolean that indicaes whether it should validate that all characters are ASCII characters.
+- `line_separator`: string that represents the separator that will be used between lines. Usually this shouldn't be modified, to make sure the resulting JSON is valid.
+- `value_separator`: string that represents the separator that will be used between JSON keys and values. If you need to get rid of extra space after the collon, you can configure that using this parameter.
+- `keep_arrays_single_line`: boolean that indicates whether we need to re-structure arrays and make them single-line.
+- `max_arrays_line_length`: integer that determines the max length of single-line values. When the line exceeds this max length, it will be formatted in a multi-line fashion.
+- `pretty_on_save`: boolean that indicates whether JSON files should be automatically prettified on each file save.
+- `validate_on_save`: boolean that indicates whether JSON files should be automatically validated on each file save.
+- `brace_newline`: boolean that indicates whether there should be a newline after braces.
+- `bracket_newline`: boolean that indicates whether there should be a newline after brackets. `true` here means the resulting JSON will look like the Allman indentation style, while `false` will result in an OTBS indentation style.
+- `reindent_block`: if we are formatting a selection, if we need to reindent the resulting block to follow the flow of the source document the posible values are `minimal` and `start`.
       
-      using `minimal`, the resulting json lines are indented as much
-      spaces as the line where the selection starts. e.g
+    Using `minimal` the resulting json lines are indented as much spaces as theline where the selection starts. E.g.:
 
     ```yaml
     yaml_container:
-      yaml_key: { "json": "value" }
+    yaml_key: { "json": "value" }
     ```
-
-    gets formatted as:
-
+    
+    Gets formatted as:
+    
     ```yaml
     yaml_container:
         yaml_key: {
           "json": "value"
         }
     ```
-
-    using `start`, the resulting json lines are indented a number
-    of spaces equal to the column number of the start of the selection
-
-    with `start` the previous example gets formatted as:
-
+    
+    Using `start`, the resulting json lines are indented a number of spaces equal to the column number of the start of the selection.
+    With `start` the previous example gets formatted as:
+    
     ```yaml
     yaml_container:
         yaml_key: {
                     "json": "value"
                   }
     ```
+    
+    Use `false` if you wouldn't like the formatter to reindent the block at all.
+- `jq_binary`: path to the jq binary, e.g. `/usr/bin/local/jq`.
 
 ## Using tabs for indentation
 

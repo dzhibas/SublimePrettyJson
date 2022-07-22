@@ -3,6 +3,8 @@
     "indent": 4,
     "sort_keys": false,
     "ensure_ascii": false,
+    "abort_format_on_duplicate_key": {},
+    "set_syntax_on_format": true,
     "line_separator": ",",
     "value_separator": ": ",
     "keep_arrays_single_line": false,

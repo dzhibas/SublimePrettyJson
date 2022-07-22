@@ -31,8 +31,8 @@ class PrettyJsonBaseCommand:
     phantoms = list()
     force_sorting = False
     json_char_matcher = re.compile(r"char (\d+)")
-    brace_newline = re.compile(r'^((\s*)".*?":)\s*([{])', re.MULTILINE)
-    bracket_newline = re.compile(r'^((\s*)".*?":)\s*([\[])', re.MULTILINE)
+    brace_newline = re.compile(r'^(^([ \t]*)(\"[^\"]*\"):)\s*([{])', re.MULTILINE)
+    bracket_newline = re.compile(r'^(^([ \t]*)(\"[^\"]*\"):)\s*([\[])', re.MULTILINE)
 
     @staticmethod
     def json_loads(selection: str, object_pairs_hook=OrderedDict):
@@ -92,12 +92,12 @@ class PrettyJsonBaseCommand:
 
         elif settings.get("bracket_newline", True):
             output_json = PrettyJsonBaseCommand.bracket_newline.sub(
-                r"\1\n\2\3", output_json
+                r"\1\n\2\4", output_json
             )
 
         if settings.get("brace_newline", True):
             output_json = PrettyJsonBaseCommand.brace_newline.sub(
-                r"\1\n\2\3", output_json
+                r"\1\n\2\4", output_json
             )
 
         return output_json
@@ -140,9 +140,8 @@ class PrettyJsonBaseCommand:
 
         return "\n".join(lines)
 
-    def show_exception(self, region: sublime.Region = None, msg=str()):
-        sublime.message_dialog(f"[Error]: {msg}")
-        if region is None:
+    def show_exception(self, region: sublime.Region = None, msg=""):
+        if region is None or region.empty():
             sublime.message_dialog(f"[Error]: {msg}")
             return
         self.highlight_error(region=region, message=f"{msg}")
@@ -203,8 +202,16 @@ class PrettyJsonBaseCommand:
             0
         ]
         as_json = [i.lower() for i in settings.get("as_json", ["JSON"])]
-        if syntax.lower() not in as_json:
+        if syntax.lower() not in as_json and settings.get("set_syntax_on_format", True):
             self.view.set_syntax_file(json_syntax)
+
+    def duplicate_key_hook(self, pairs):
+        result = dict()
+        for key, val in pairs:
+            if key in result:
+                raise KeyError(f"Duplicate key specified: {key}")
+            result[key] = val
+        return result
 
 
 class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
@@ -225,14 +232,6 @@ class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
                 return
 
             sublime.status_message("JSON Valid")
-
-    def duplicate_key_hook(self, pairs):
-        result = dict()
-        for key, val in pairs:
-            if key in result:
-                raise KeyError(f"Duplicate key specified: {key}")
-            result[key] = val
-        return result
 
 
 class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
@@ -255,7 +254,15 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
 
             selection_text = self.view.substr(region)
             try:
-                obj = self.json_loads(selection_text)
+                obj = {}
+                if settings.get("abort_format_on_duplicate_key", False):
+                    try:
+                        self.json_loads(selection_text, self.duplicate_key_hook)
+                    except Exception as ex:
+                        self.show_exception(region=region, msg=ex)
+                        return
+                else:
+                    obj = self.json_loads(selection_text)
                 json_text = self.json_dumps(obj=obj, minified=False, force_sorting=self.force_sorting)
                 if not entire_file and settings.get("reindent_block", False):
                     json_text = self.reindent(json_text, region)
@@ -302,6 +309,7 @@ class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
     def run(self, edit):
         self.clear_phantoms()
         regions = self.view.sel()
+        error_count = 0
         for region in regions:
             (selection, selected_entire_file,) = self.get_selection_from_region(
                 region=region, regions_length=len(regions), view=self.view
@@ -310,12 +318,17 @@ class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
                 continue
 
             for jsonl in sorted(self.view.split_by_newlines(selection), reverse=True):
+                if error_count > 2:
+                    self.show_exception(msg="Encountered to many errors. Aborting")
+                    return
+
                 if self.view.substr(jsonl).strip() == "":
                     continue
 
                 if jsonl.empty() and len(jsonl) > 1:
                     continue
 
+                selection_text = ""
                 try:
                     selection_text = self.view.substr(jsonl)
                     obj = self.json_loads(selection_text)
@@ -325,6 +338,7 @@ class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
                         self.syntax_to_json()
 
                 except Exception:
+                    error_count += 1
                     try:
                         amount_of_single_quotes = re.findall(
                             r"(\'[^\']+\'?)", selection_text
@@ -342,10 +356,9 @@ class PrettyJsonLinesCommand(PrettyJsonCommand, sublime_plugin.TextCommand):
 
                             if selected_entire_file:
                                 self.syntax_to_json()
-                        else:
-                            self.show_exception()
-                    except:
-                        self.show_exception()
+                    except Exception as ex:
+                        error_count += 1
+                        self.show_exception(msg=ex)
 
 
 class PrettyJsonAndSortCommand(PrettyJsonCommand, sublime_plugin.TextCommand):

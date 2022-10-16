@@ -168,7 +168,7 @@ class PrettyJsonBaseCommand:
         )
         self.phantom_set.update(self.phantoms)
         self.view.show(region)
-        self.view.set_status("json_errors", message)
+        sublime.status_message(f"json_errors\t{message}")
 
     # Description: Taken from
     # - https://github.com/sublimelsp/LSP/blob/master/plugin/diagnostics.py

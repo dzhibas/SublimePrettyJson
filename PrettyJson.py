@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import webbrowser
 from xml.etree import ElementTree as et
+from typing import Any, Callable, Optional
 
 import sublime
 import sublime_plugin
@@ -34,8 +35,12 @@ class PrettyJsonBaseCommand:
     brace_newline = re.compile(r'^(^([ \t]*)(\"[^\"]*\"):)\s*([{])', re.MULTILINE)
     bracket_newline = re.compile(r'^(^([ \t]*)(\"[^\"]*\"):)\s*([\[])', re.MULTILINE)
 
+    def __init__(self, *args, **kwargs):
+        # Late init for most subclasses
+        self.view: Optional[sublime.View] = None
+
     @staticmethod
-    def json_loads(selection: str, object_pairs_hook=OrderedDict):
+    def json_loads(selection: str, object_pairs_hook: Callable = OrderedDict):
         return json.loads(
             selection, object_pairs_hook=object_pairs_hook, parse_float=decimal.Decimal
         )
@@ -116,7 +121,10 @@ class PrettyJsonBaseCommand:
 
         return region, entire_file
 
-    def reindent(self, text: str, selection: sublime.Region):
+    def reindent(self, text: str, selection: sublime.Region) -> str:
+        if self.view is None:
+            return text
+
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
         current_line = self.view.line(selection.begin())
         text_before_sel = sublime.Region(current_line.begin(), selection.begin())
@@ -127,9 +135,10 @@ class PrettyJsonBaseCommand:
             space_number = text_before_sel.size()
             indent_space = " " * space_number
         elif reindent_mode == "minimal":
-            indent_space = re.search(r"^\s*", self.view.substr(text_before_sel)).group(
-                0
-            )
+            match = re.search(r"^\s*", self.view.substr(text_before_sel))
+            if match is None:
+                return text
+            indent_space = match.group(0)
 
         lines = text.split("\n")
 
@@ -140,13 +149,16 @@ class PrettyJsonBaseCommand:
 
         return "\n".join(lines)
 
-    def show_exception(self, region: sublime.Region = None, msg=""):
+    def show_exception(self, region: Optional[sublime.Region] = None, msg: Any = ""):
         if region is None or region.empty():
             sublime.message_dialog(f"[Error]: {msg}")
             return
         self.highlight_error(region=region, message=f"{msg}")
 
     def highlight_error(self, region: sublime.Region, message: str):
+        if self.view is None:
+            return
+
         self.phantom_set = sublime.PhantomSet(self.view, "json_errors")
 
         char_match = self.json_char_matcher.search(message)
@@ -190,6 +202,9 @@ class PrettyJsonBaseCommand:
         self.clear_phantoms()
 
     def clear_phantoms(self):
+        if self.view is None:
+            return
+
         if isinstance(self.phantom_set, type):
             self.phantom_set = sublime.PhantomSet(self.view, "json_errors")
 
@@ -197,6 +212,9 @@ class PrettyJsonBaseCommand:
         self.phantom_set.update(self.phantoms)
 
     def syntax_to_json(self):
+        if self.view is None:
+            return
+
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
         syntax = os.path.splitext(os.path.basename(self.view.settings().get("syntax")))[
             0
@@ -216,6 +234,9 @@ class PrettyJsonBaseCommand:
 
 class PrettyJsonValidate(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     def run(self, edit):
+        if self.view is None:
+            return
+
         self.clear_phantoms()
         regions = self.view.sel()
         for region in regions:
@@ -240,6 +261,9 @@ class PrettyJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
     """
 
     def run(self, edit):
+        if self.view is None:
+            return
+
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
 
         self.clear_phantoms()
@@ -449,26 +473,29 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
     Description: ./jq integration
     """
 
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         settings = sublime.load_settings("Pretty JSON.sublime-settings")
 
         if not self.window:
-            return
+            return False
 
         view = self.window.active_view()
         if not view:
-            return
+            return False
 
         as_json = settings.get("as_json", ["JSON"])
         return any(syntax in view.settings().get("syntax", "") for syntax in as_json)
 
-    def is_visible(self):
+    def is_visible(self) -> bool:
         return self.is_enabled()
 
     def run(self):
         jq_path = get_jq_path()
         if jq_path:
             preview_view = self.window.active_view()
+            if preview_view is None:
+                return
+
             preview_view.run_command("jq_pretty_json")
             sublime.active_window().show_input_panel(
                 "Enter ./jq filter expression",
@@ -485,10 +512,13 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                 webbrowser.open("http://stedolan.github.io/jq")
 
 
-    def get_content(self):
+    def get_content(self) -> Optional[str]:
         """returns content of active view or selected region"""
         view = self.window.active_view()
-        selection = ""
+        if view is None:
+            return None
+
+        selection = None
         regions = view.sel()
         for region in regions:
             if region.empty() and len(regions) > 1:
@@ -497,6 +527,9 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                 selection = sublime.Region(0, view.size())
             else:
                 selection = region
+        if selection is None:
+            return None
+
         return view.substr(selection)
 
     def send_query(self, jq_path: str, query: str):
@@ -511,6 +544,8 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
             )
             QUERY_LEN = len(query)
             raw_json = self.get_content()
+            if raw_json is None:
+                return
 
             if not PREVIOUS_CONTENT[0]:
                 PREVIOUS_CONTENT[0] = raw_json
@@ -522,6 +557,8 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
             output = out.decode("UTF-8").replace(os.linesep, "\n").strip()
             errors = err.decode("UTF-8").replace(os.linesep, "\n").strip()
             jq_view = sublime.active_window().active_view_in_group(1)
+            if jq_view is None:
+                return
 
             if output and output != "null":
                 if QUERY_LEN > PREVIOUS_QUERY_LEN:
@@ -543,7 +580,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
         except OSError as ex:
             sublime.status_message(str(ex))
 
-    def done(self):
+    def done(self, _: str):
         global PREVIOUS_CONTENT
         PREVIOUS_CONTENT = list()
 

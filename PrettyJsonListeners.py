@@ -28,5 +28,6 @@ class PrettyJsonAutoPrettyOnSaveListener(sublime_plugin.EventListener):
             return
 
         as_json = s.get("as_json", ["JSON"])
-        if any(syntax in view.settings().get("syntax") for syntax in as_json):
+        view_syntax = view.settings().get("syntax")
+        if any(syntax in view_syntax for syntax in as_json):
             view.run_command("pretty_json")

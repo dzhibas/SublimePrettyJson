@@ -9,8 +9,8 @@
     "value_separator": ": ",
     "keep_arrays_single_line": false,
     "max_arrays_line_length": 120,
-    "pretty_on_save": true,
-    "validate_on_save": true,
+    "pretty_on_save": false,
+    "validate_on_save": false,
     "brace_newline": true,
     "bracket_newline": true,
     // Default: False

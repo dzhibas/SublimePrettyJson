@@ -79,12 +79,12 @@ class PrettyJsonBaseCommand:
                         replacement = replacement + item
                         if item == '}':
                             if index != len(items)-1 and items[index+1] != "}":
-                                replacement = replacement + ','
+                                replacement = replacement + ', '
                     else:
                         replacement = replacement + item
                         if index != len(items)-1:
                             if items[index+1] != '}':
-                                replacement = replacement + ','
+                                replacement = replacement + ', '
                 replacement = replacement + ']'
 
                 if len(replacement) <= settings.get("max_arrays_line_length", 120):

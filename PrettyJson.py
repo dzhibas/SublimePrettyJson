@@ -508,6 +508,7 @@ class JqQueryPrettyJson(sublime_plugin.WindowCommand):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,
+                creationflags=subprocess.CREATE_NO_WINDOW,
             )
             QUERY_LEN = len(query)
             raw_json = self.get_content()

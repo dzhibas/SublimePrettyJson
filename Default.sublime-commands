@@ -16,6 +16,14 @@
         "command": "un_pretty_json"
     },
     {
+        "caption": "Pretty JSON: Escape JSON",
+        "command": "escape_json"
+    },
+    {
+        "caption": "Pretty JSON: Unescape JSON",
+        "command": "unescape_json"
+    },
+    {
         "caption": "Pretty JSON: json2xml",
         "command": "json_to_xml"
     },

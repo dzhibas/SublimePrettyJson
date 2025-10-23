@@ -660,3 +660,79 @@ class PrettyJsonGotoSymbolCommand(PrettyJsonBaseCommand, sublime_plugin.TextComm
         self.view.sel().clear()
         self.view.sel().add(region)
         self.view.show(region)
+
+
+class EscapeJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
+    """
+    描述：转义 JSON 字符串 - 将 JSON 转换为可以作为字符串值使用的转义格式
+    """
+
+    def run(self, edit):
+        self.clear_phantoms()
+        regions = self.view.sel()
+        for region in regions:
+            region, entire_file = self.get_selection_from_region(
+                region=region, regions_length=len(region), view=self.view
+            )
+            if region is None:
+                continue
+
+            try:
+                selection_text = self.view.substr(region)
+                # 先验证 JSON 是否有效
+                obj = self.json_loads(selection_text)
+                # 将 JSON 转换为字符串（压缩格式）
+                json_str = self.json_dumps(obj=obj, minified=True)
+                # 转义 JSON 字符串
+                escaped_json = json.dumps(json_str, ensure_ascii=False)
+                # 移除最外层的引号
+                escaped_json = escaped_json[1:-1]
+
+                self.view.replace(edit, region, escaped_json)
+                sublime.status_message("JSON 已转义")
+
+            except Exception as ex:
+                self.show_exception(region=region, msg=f"转义 JSON 失败: {ex}")
+
+
+class UnescapeJsonCommand(PrettyJsonBaseCommand, sublime_plugin.TextCommand):
+    """
+    描述：反转义 JSON 字符串 - 将转义的 JSON 字符串还原为正常的 JSON 格式
+    """
+
+    def run(self, edit):
+        settings = sublime.load_settings("Pretty JSON.sublime-settings")
+        self.clear_phantoms()
+        regions = self.view.sel()
+        for region in regions:
+            region, entire_file = self.get_selection_from_region(
+                region=region, regions_length=len(region), view=self.view
+            )
+            if region is None:
+                continue
+
+            try:
+                selection_text = self.view.substr(region)
+                # 添加引号以便正确解析转义的字符串
+                wrapped_text = f'"{selection_text}"'
+                # 反转义字符串
+                unescaped_str = json.loads(wrapped_text)
+
+                # 尝试解析反转义后的字符串为 JSON
+                try:
+                    obj = self.json_loads(unescaped_str)
+                    # 美化 JSON 输出
+                    json_text = self.json_dumps(obj=obj, minified=False)
+
+                    if not entire_file and settings.get("reindent_block", False):
+                        json_text = self.reindent(json_text, region)
+
+                    self.view.replace(edit, region, json_text)
+                    sublime.status_message("JSON 已反转义并格式化")
+                except Exception:
+                    # 如果不是有效的 JSON，只返回反转义的字符串
+                    self.view.replace(edit, region, unescaped_str)
+                    sublime.status_message("字符串已反转义（但不是有效的 JSON）")
+
+            except Exception as ex:
+                self.show_exception(region=region, msg=f"反转义失败: {ex}")
